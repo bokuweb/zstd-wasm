@@ -43,9 +43,12 @@ export const decompress = async (buf: ArrayBuffer): Promise<ArrayBuffer> => {
       throw new Error(getErrorName(code));
     }
   } catch (e) {
-    free(heap);
+    free(heap, code);
     throw e;
   }
-  free(heap);
-  return new Uint8Array(Module.HEAPU8.buffer, heap, code);
+  // Copy buffer
+  // Uint8Array.prototype.slice() return copied.
+  const data = new Uint8Array(Module.HEAPU8.buffer, heap, code).slice();
+  free(heap, code);
+  return data;
 };
