@@ -9,8 +9,9 @@
     "prebuild": "cp ./asset/buf.c ./zstd/lib/common/buf.c && cp ./asset/export_module.js ./zstd/export_module.js",
     "copy": "cp ./zstd/zstd.wasm ./lib/wasm && cp ./zstd/zstd.js ./lib/wasm",
     "make:zstd": "npm run prebuild && cd zstd && docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk emmake make lib-release",
-    "build:wasm": "npm run make:zstd && cd zstd && docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk emcc -flto -o ./zstd.js -O3 --memory-init-file 0 --post-js export_module.js -s EXPORTED_FUNCTIONS=\"['_ZSTD_isError', '_ZSTD_getFrameContentSize', '_ZSTD_getErrorName', '_ZSTD_decompress']\" -s EXPORTED_RUNTIME_METHODS=\"['cwrap', 'destroy_buffer', 'create_buffer']\" -s FILESYSTEM=0 -s ALLOW_MEMORY_GROWTH=1 lib/libzstd.so && npm run copy"
-  },
+    "build:wasm": "npm run make:zstd && cd zstd && docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk emcc -flto -o ./zstd.js -O3 --memory-init-file 0 --post-js export_module.js -s EXPORTED_FUNCTIONS=\"['_ZSTD_isError', '_ZSTD_getFrameContentSize', '_ZSTD_getErrorName', '_ZSTD_decompress', '_ZSTD_compress', '_ZSTD_compressBound']\" -s EXPORTED_RUNTIME_METHODS=\"['cwrap', 'destroy_buffer', 'create_buffer']\" -s FILESYSTEM=0 -s ALLOW_MEMORY_GROWTH=1 lib/libzstd.so && npm run copy",
+    "build": "npm run build:wasm"
+      },
   "devDependencies": {
     "@types/node": "^15.6.1",
     "typescript": "^4.3.2"
