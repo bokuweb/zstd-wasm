@@ -30,6 +30,7 @@ export const decompress = async (buf: ArrayBuffer): Promise<ArrayBuffer> => {
   const malloc = Module.cwrap("create_buffer", "number", ["number"]);
   const free = Module.cwrap("destroy_buffer", "number");
   const heap = malloc(size);
+  let code;
   try {
     const _decompress = Module.cwrap("ZSTD_decompress", "number", [
       "number",
@@ -37,7 +38,7 @@ export const decompress = async (buf: ArrayBuffer): Promise<ArrayBuffer> => {
       "array",
       "number",
     ]);
-    const code = _decompress(heap, size, buf, buf.byteLength);
+    code = _decompress(heap, size, buf, buf.byteLength);
     if (isError(code)) {
       throw new Error(getErrorName(code));
     }
@@ -46,5 +47,5 @@ export const decompress = async (buf: ArrayBuffer): Promise<ArrayBuffer> => {
     throw e;
   }
   free(heap);
-  return new Uint8Array(Module.HEAPU8.buffer, heap, size);
+  return new Uint8Array(Module.HEAPU8.buffer, heap, code);
 };
