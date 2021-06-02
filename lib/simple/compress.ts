@@ -12,8 +12,6 @@ export const compress = async (buf: ArrayBuffer, level: number) => {
   const malloc = Module.cwrap('create_buffer', 'number', ['number']);
   const compressed = malloc(bound);
   const free = Module.cwrap('destroy_buffer', 'number');
-
-  let sizeOrError: number | null = null;
   try {
     /*
       @See https://zstd.docsforge.com/dev/api/ZSTD_compress/
@@ -24,17 +22,17 @@ export const compress = async (buf: ArrayBuffer, level: number) => {
                 or an error code if it fails (which can be tested using ZSTD_isError()).
     */
     const _compress = Module.cwrap('ZSTD_compress', 'number', ['number', 'number', 'array', 'number', 'number']);
-    sizeOrError = _compress(compressed, bound, buf, buf.byteLength, level);
+    const sizeOrError = _compress(compressed, bound, buf, buf.byteLength, level);
     if (isError(sizeOrError)) {
       throw new Error(getErrorName(sizeOrError));
     }
+    // // Copy buffer
+    // // Uint8Array.prototype.slice() return copied buffer.
+    const data = new Uint8Array(Module.HEAPU8.buffer, compressed, sizeOrError).slice();
+    free(compressed, bound);
+    return data;
   } catch (e) {
     free(compressed, bound);
     throw e;
   }
-  // // Copy buffer
-  // // Uint8Array.prototype.slice() return copied buffer.
-  const data = new Uint8Array(Module.HEAPU8.buffer, compressed, sizeOrError).slice();
-  free(compressed, bound);
-  return data;
 };

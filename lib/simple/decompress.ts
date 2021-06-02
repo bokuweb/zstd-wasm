@@ -6,14 +6,20 @@ const getFrameContentSize = (buf: ArrayBuffer): number => {
   return getSize(buf, buf.byteLength);
 };
 
-export const decompress = async (buf: ArrayBuffer): Promise<ArrayBuffer> => {
+export type DecompressOption = {
+  defaultHeapSize?: number;
+};
+
+export const decompress = async (
+  buf: ArrayBuffer,
+  opts: DecompressOption = { defaultHeapSize: 1024 * 1024 }, // Use 1MB on default if it is failed to get content size.
+): Promise<ArrayBuffer> => {
   await waitInitialized();
   const contentSize = getFrameContentSize(buf);
-  const size = contentSize === -1 ? 1024 * 1024 : contentSize;
+  const size = contentSize === -1 ? opts.defaultHeapSize : contentSize;
   const malloc = Module.cwrap('create_buffer', 'number', ['number']);
   const free = Module.cwrap('destroy_buffer', 'number');
   const heap = malloc(size);
-  let code;
   try {
     /*
       @See https://zstd.docsforge.com/dev/api/ZSTD_decompress/
@@ -23,17 +29,17 @@ export const decompress = async (buf: ArrayBuffer): Promise<ArrayBuffer> => {
       @return: the number of bytes decompressed into dst (<= dstCapacity), or an errorCode if it fails (which can be tested using ZSTD_isError()).
     */
     const _decompress = Module.cwrap('ZSTD_decompress', 'number', ['number', 'number', 'array', 'number']);
-    code = _decompress(heap, size, buf, buf.byteLength);
-    if (isError(code)) {
-      throw new Error(getErrorName(code));
+    const sizeOrError = _decompress(heap, size, buf, buf.byteLength);
+    if (isError(sizeOrError)) {
+      throw new Error(getErrorName(sizeOrError));
     }
+    // Copy buffer
+    // Uint8Array.prototype.slice() return copied buffer.
+    const data = new Uint8Array(Module.HEAPU8.buffer, heap, sizeOrError).slice();
+    free(heap, size);
+    return data;
   } catch (e) {
-    free(heap, code);
+    free(heap, size);
     throw e;
   }
-  // Copy buffer
-  // Uint8Array.prototype.slice() return copied buffer.
-  const data = new Uint8Array(Module.HEAPU8.buffer, heap, code).slice();
-  free(heap, code);
-  return data;
 };
