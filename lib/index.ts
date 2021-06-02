@@ -25,7 +25,8 @@ const getFrameContentSize = (buf: ArrayBuffer): number => {
 
 export const decompress = async (buf: ArrayBuffer): Promise<ArrayBuffer> => {
   await initialized;
-  const size = getFrameContentSize(buf);
+  const contentSize = getFrameContentSize(buf);
+  const size = contentSize === -1 ? 1024 * 1024 : contentSize;
   const malloc = Module.cwrap("create_buffer", "number", ["number"]);
   const free = Module.cwrap("destroy_buffer", "number");
   const heap = malloc(size);
