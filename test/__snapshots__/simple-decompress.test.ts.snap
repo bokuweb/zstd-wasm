@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`decompress multiple json 1`] = `
+Object {
+  "document": Object {
+    "data": Object {
+      "id": "74207427-90f9-46f1-a6dc-ff21c0fa0f92",
+    },
+    "nodes": Array [
+      Object {
+        "data": Object {},
+        "nodes": Array [
+          Object {
+            "leaves": Array [
+              Object {
+                "marks": Array [],
+                "object": "leaf",
+                "text": "sdfdsf2",
+              },
+            ],
+            "object": "text",
+          },
+        ],
+        "object": "block",
+        "type": "line",
+      },
+    ],
+    "object": "document",
+  },
+  "object": "value",
+}
+`;
+
+exports[`decompress multiple json 2`] = `
+Object {
+  "document": Object {
+    "data": Object {
+      "id": "74207427-90f9-46f1-a6dc-ff21c0fa0f92",
+    },
+    "nodes": Array [
+      Object {
+        "data": Object {},
+        "nodes": Array [
+          Object {
+            "leaves": Array [
+              Object {
+                "marks": Array [],
+                "object": "leaf",
+                "text": "sdfdsf",
+              },
+            ],
+            "object": "text",
+          },
+        ],
+        "object": "block",
+        "type": "line",
+      },
+    ],
+    "object": "document",
+  },
+  "object": "value",
+}
+`;
