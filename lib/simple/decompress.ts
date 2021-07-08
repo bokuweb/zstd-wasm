@@ -17,8 +17,8 @@ export const decompress = async (
   await waitInitialized();
   const contentSize = getFrameContentSize(buf);
   const size = contentSize === -1 ? opts.defaultHeapSize : contentSize;
-  const malloc = Module.cwrap('create_buffer', 'number', ['number']);
-  const free = Module.cwrap('destroy_buffer', 'number');
+  const malloc = Module.cwrap('malloc', 'number', ['number']);
+  const free = Module.cwrap('free', 'number');
   const heap = malloc(size);
   try {
     /*
