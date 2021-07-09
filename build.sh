@@ -2,7 +2,19 @@
 
 set -eu
 
-cd zstd/build/single_file_libs
+rm -rf ./zstd
+
+git clone https://github.com/facebook/zstd.git zstd
+
+cd zstd
+
+latest=`git describe --tags $(git rev-list --tags --max-count=1)`
+
+echo $latest
+
+git checkout -b $latest
+
+cd build/single_file_libs
 
 bash ./create_single_file_library.sh
 
