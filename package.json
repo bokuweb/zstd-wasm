@@ -1,6 +1,6 @@
 {
   "name": "@bokuweb/zstd-wasm",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "lib/index.js",
   "repository": "ssh://git@github.com/bokuweb/zstd-wasm.git",
   "author": "<bokuweb12@gmail.com>",
