@@ -7,6 +7,7 @@
   "license": "MIT",
   "scripts": {
     "tsc": "tsc -p tsconfig.json --skipLibCheck",
+    "bundle": "webpack",
     "serve": "webpack-dev-server",
     "benchmark": "npx ts-node ./benchmark/index.ts",
     "copy": "cp ./zstd/zstd.wasm ./lib/wasm && cp ./zstd/zstd.js ./lib/wasm",
@@ -20,6 +21,7 @@
     "@types/jest": "26.0.23",
     "@types/node": "15.6.1",
     "benchmark": "2.1.4",
+    "copy-webpack-plugin": "^6",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^3.2.0",
     "jest": "27.0.3",
