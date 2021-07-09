@@ -1,7 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
-const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -20,6 +19,11 @@ module.exports = {
           transpileOnly: true,
         },
       },
+      {
+        test: /zstd\.wasm$/,
+        type: 'javascript/auto',
+        loader: 'file-loader',
+      },
     ],
   },
   resolve: {
@@ -30,9 +34,6 @@ module.exports = {
     new webpack.ProvidePlugin({
       TextDecoder: ['text-encoding', 'TextDecoder'],
       TextEncoder: ['text-encoding', 'TextEncoder'],
-    }),
-    new CopyPlugin({
-      patterns: [{ from: 'lib/wasm/zstd.wasm', to: 'zstd.wasm' }],
     }),
   ],
   mode: 'development',
