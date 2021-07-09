@@ -1,10 +1,27 @@
 import { decompress } from '../lib/simple/decompress';
+import { compress } from '../lib/simple/compress';
 
-const dataA =
-  'KLUv/QBgpQQA0gkfHWClqgMIrrCtT3yQwJQIidYIgtCCI8CfnRdBEHABc7LJJpvs0EdlsMvRV0fXLl7Re/k5y+/oEoAlM8m7ngUB8uhKgw859JEdZI7ml9FqWzVhdafmiE1CE0MyWhmpWEOh1lBc75I/+pXrjvSS4aVp0B2dm7fO9bJxAIF/AgcARQ3FJ+JWVRjGDm8FszjLChgqDw==';
+const hello = 'KLUv/SQMYQAASGVsbG8genN0ZCEhN2g+CQ==';
 
 (async () => {
-  const resA = await decompress(Buffer.from(dataA, 'base64'));
-  const jsonA = Buffer.from(resA).toString();
-  console.log(jsonA);
+  const decompressTest = async () => {
+    const res = await decompress(Buffer.from(hello, 'base64'));
+    const str = Buffer.from(res).toString();
+    console.log(str);
+    if (str !== 'Hello zstd!!') throw new Error('Failed to decompressTest by zstd.');
+    console.log(`%c${str}`, 'color: lightgreen;');
+    console.log('%cSucceeded to decompressTest.', 'color: lightgreen;');
+  };
+
+  const compressAndDecompressTest = async () => {
+    const compressed = await compress(Buffer.from('Hello zstd!!'), 10);
+    const res = await decompress(compressed);
+    const str = Buffer.from(res).toString();
+    if (str !== 'Hello zstd!!') throw new Error('Failed to compressAndDecompressTest by zstd.');
+    console.log(`%c${str}`, 'color: lightgreen;');
+    console.log('%cSucceeded to compressAndDecompressTest.', 'color: lightgreen;');
+  };
+
+  await decompressTest();
+  await compressAndDecompressTest();
 })();
