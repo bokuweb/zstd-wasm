@@ -16,6 +16,9 @@
     "build": "npm run build:wasm",
     "test": "jest"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@types/benchmark": "2.1.0",
     "@types/jest": "26.0.23",
