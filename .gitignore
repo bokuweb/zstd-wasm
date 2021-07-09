@@ -118,5 +118,4 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-zstd.wasm
 zstd
