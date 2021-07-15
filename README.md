@@ -12,7 +12,7 @@ npm install @bokuweb/zstd-wasm
 ### without bundlers
 
 ``` js
-import { init, compress, decompress } from '.@bokuweb/zstd-wasm';
+import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 
 (async () => {
   await init('./zstd.wasm'); // Please deploy `node_modules/@bokuweb/zstd-wasm/lib/wasm/zstd.wasm` to your hosting server.
@@ -25,7 +25,7 @@ import { init, compress, decompress } from '.@bokuweb/zstd-wasm';
 ### with webpack4
 
 ``` js
-import { init, compress, decompress } from '.@bokuweb/zstd-wasm';
+import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 
 (async () => {
   await init();
@@ -52,7 +52,7 @@ import { init, compress, decompress } from '.@bokuweb/zstd-wasm';
 ### with webpack5
 
 ``` js
-import { init, compress, decompress } from '.@bokuweb/zstd-wasm';
+import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 
 (async () => {
   await init();
