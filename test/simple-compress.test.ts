@@ -1,9 +1,11 @@
 import { decompress } from '../lib/simple/decompress';
 import { compress } from '../lib/simple/compress';
+import { init } from '../lib/init';
 
 test('hello', async () => {
-  const compressed = await compress(Buffer.from('Hello'), 10);
+  await init();
+  const compressed = compress(Buffer.from('Hello'), 10);
   expect(compressed).toMatchSnapshot();
-  const decompressed = await decompress(compressed);
+  const decompressed = decompress(compressed);
   expect(Buffer.from(decompressed).toString()).toBe('Hello');
 });

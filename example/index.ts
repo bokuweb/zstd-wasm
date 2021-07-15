@@ -1,5 +1,6 @@
 import { decompress } from '../lib/simple/decompress';
 import { compress } from '../lib/simple/compress';
+import { init } from '../lib/init';
 
 const hello = 'KLUv/SQMYQAASGVsbG8genN0ZCEhN2g+CQ==';
 
@@ -21,7 +22,7 @@ const hello = 'KLUv/SQMYQAASGVsbG8genN0ZCEhN2g+CQ==';
     console.log(`%c${str}`, 'color: lightgreen;');
     console.log('%cSucceeded to compressAndDecompressTest.', 'color: lightgreen;');
   };
-
+  await init();
   await decompressTest();
   await compressAndDecompressTest();
 })();

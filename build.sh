@@ -16,6 +16,8 @@ git checkout -b $latest
 
 cd build/single_file_libs
 
+bash ./combine.sh -r ../../lib -o ../../../zstd.c ./zstd-in.c
+
 bash ./create_single_file_library.sh
 
 cp zstd.c ../../../zstd.c

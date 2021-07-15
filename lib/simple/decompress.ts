@@ -1,4 +1,4 @@
-import { waitInitialized, Module } from '../init';
+import { Module } from '../init';
 import { isError, getErrorName } from '../errors';
 
 const getFrameContentSize = (buf: ArrayBuffer): number => {
@@ -10,11 +10,10 @@ export type DecompressOption = {
   defaultHeapSize?: number;
 };
 
-export const decompress = async (
+export const decompress = (
   buf: ArrayBuffer,
   opts: DecompressOption = { defaultHeapSize: 1024 * 1024 }, // Use 1MB on default if it is failed to get content size.
-): Promise<ArrayBuffer> => {
-  await waitInitialized();
+): ArrayBuffer => {
   const contentSize = getFrameContentSize(buf);
   const size = contentSize === -1 ? opts.defaultHeapSize : contentSize;
   const malloc = Module.cwrap('malloc', 'number', ['number']);
