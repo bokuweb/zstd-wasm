@@ -9,4 +9,9 @@ export const waitInitialized = async () => {
   await initialized;
 };
 
+export const init = async (path?: string) => {
+  Module['init'](path);
+  await waitInitialized();
+};
+
 export { Module };

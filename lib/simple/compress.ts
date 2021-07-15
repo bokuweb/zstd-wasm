@@ -1,4 +1,4 @@
-import { waitInitialized, Module } from '../init';
+import { Module } from '../init';
 import { isError, getErrorName } from '../errors';
 
 const compressBound = (size: number): number => {
@@ -6,12 +6,11 @@ const compressBound = (size: number): number => {
   return bound(size);
 };
 
-export const compress = async (buf: ArrayBuffer, level: number) => {
-  await waitInitialized();
+export const compress = (buf: ArrayBuffer, level: number) => {
   const bound = compressBound(buf.byteLength);
-  const malloc = Module.cwrap('create_buffer', 'number', ['number']);
+  const malloc = Module.cwrap('malloc', 'number', ['number']);
   const compressed = malloc(bound);
-  const free = Module.cwrap('destroy_buffer', 'number');
+  const free = Module.cwrap('free', 'number');
   try {
     /*
       @See https://zstd.docsforge.com/dev/api/ZSTD_compress/
