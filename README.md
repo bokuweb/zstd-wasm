@@ -11,6 +11,8 @@ npm install @bokuweb/zstd-wasm
 
 ### Node.js
 
+Playground: https://runkit.com/bokuweb/60f1172a58aae5001aea2418
+
 ``` js
 const { init, compress, decompress } = require('@bokuweb/zstd-wasm');
 
