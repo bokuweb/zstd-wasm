@@ -119,3 +119,5 @@ dist
 .pnp.*
 
 zstd
+./zstd.js
+./zstd.wasm
