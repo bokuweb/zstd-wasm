@@ -1,6 +1,6 @@
 {
   "name": "@bokuweb/zstd-wasm",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "repository": "ssh://git@github.com/bokuweb/zstd-wasm.git",
   "author": "<bokuweb12@gmail.com>",
   "license": "MIT",
