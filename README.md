@@ -24,6 +24,11 @@ import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 
 ### with webpack4
 
+We need to use `file-loader` with webpack4.
+This is because, webpack doesn’t work well with wasm modules created with Emscripten.
+See, https://github.com/webpack/webpack/issues/7352
+
+
 ``` js
 import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 
@@ -51,6 +56,11 @@ import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 
 ### with webpack5
 
+We need to use `Asset Modules` with webpack5.
+This is because, webpack doesn’t work well with wasm modules created with Emscripten.
+See, https://github.com/webpack/webpack/issues/7352
+
+
 ``` js
 import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 
@@ -73,3 +83,6 @@ import { init, compress, decompress } from '@bokuweb/zstd-wasm';
     ],
   },
 ```
+## License
+
+TypeScript glue is provided under the MIT License, and the zstd is provided by Facebook under the BSD 3-Clause License.
