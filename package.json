@@ -1,25 +1,39 @@
 {
   "name": "@bokuweb/zstd-wasm",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "repository": "ssh://git@github.com/bokuweb/zstd-wasm.git",
   "author": "<bokuweb12@gmail.com>",
   "license": "MIT",
-  "main": "lib/index.js",
-  "module": "lib/index.js",
+  "main": "dist/node/lib/index.js",
+  "module": "dist/web/lib/index.js",
+  "browser": "dist/web/lib/index.js",
+  "types": "dist/web/lib/index.d.ts",
   "scripts": {
     "tsc": "tsc -p tsconfig.json --skipLibCheck",
+    "tsc:web": "tsc -p tsconfig.web.json --skipLibCheck",
+    "copy:wasm:web": "cp -r ./lib/wasm dist/web/lib",
+    "build:web": "npm run tsc:web && npm run copy:wasm:web",
+    "tsc:node": "tsc -p tsconfig.node.json --skipLibCheck",
+    "copy:wasm:node": "cp -r ./lib/wasm dist/node/lib",
+    "build:node": "npm run tsc:node && npm run copy:wasm:node",
     "bundle": "webpack",
     "serve": "webpack-dev-server",
     "benchmark": "npx ts-node ./benchmark/index.ts",
     "copy": "cp ./zstd/zstd.wasm ./lib/wasm && cp ./zstd/zstd.js ./lib/wasm",
     "combine:zstd": "cd zstd/build/single_file_libs && bash ./create_single_file_library.sh && cp zstd.c ../../zstd.c",
+    "build:js": "npm run clean && npm run build:web && npm run build:node",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build:js",
     "build:wasm": "docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk emcc zstd.c -flto -o ./zstd.js -O3 --memory-init-file 0 --post-js export_module.js -s EXPORTED_FUNCTIONS=\"['_ZSTD_isError', '_ZSTD_getFrameContentSize', '_ZSTD_getErrorName', '_ZSTD_decompress', '_ZSTD_compress', '_ZSTD_compressBound', '_malloc', '_free']\" -s EXPORTED_RUNTIME_METHODS=\"['cwrap']\" -s FILESYSTEM=0 -s ALLOW_MEMORY_GROWTH=1",
-    "build": "npm run build:wasm",
+    "build": "npm run build:was && npm run build:js",
     "test": "jest"
   },
   "publishConfig": {
     "access": "public"
   },
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@types/benchmark": "2.1.0",
     "@types/jest": "26.0.23",
