@@ -1,10 +1,11 @@
 {
   "name": "@bokuweb/zstd-wasm",
   "version": "0.0.5",
-  "main": "lib/index.js",
   "repository": "ssh://git@github.com/bokuweb/zstd-wasm.git",
   "author": "<bokuweb12@gmail.com>",
   "license": "MIT",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
   "scripts": {
     "tsc": "tsc -p tsconfig.json --skipLibCheck",
     "bundle": "webpack",
