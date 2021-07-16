@@ -55,8 +55,12 @@ import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 })();
 ```
 
+In this case, please install `file-loader` by yourserlf.
+
 - webpack.config.js
 ``` js
+{
+  // ...snipped
   module: {
     rules: [
       {
@@ -66,6 +70,7 @@ import { init, compress, decompress } from '@bokuweb/zstd-wasm';
       },
     ],
   },
+}
 ```
 
 ---
@@ -90,6 +95,8 @@ import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 
 - webpack.config.js
 ``` js
+{
+  // ...snipped
   module: {
     rules: [
       {
@@ -98,6 +105,7 @@ import { init, compress, decompress } from '@bokuweb/zstd-wasm';
       },
     ],
   },
+}
 ```
 
 ## License
