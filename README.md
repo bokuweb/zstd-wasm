@@ -9,6 +9,19 @@ npm install @bokuweb/zstd-wasm
 ```
 ## examples
 
+### Node.js
+
+``` js
+const { init, compress, decompress } = require('@bokuweb/zstd-wasm');
+
+(async () => {
+  await init();
+  const compressed = compress(Buffer.from('Hello zstd!!'), 10);
+  const res = decompress(compressed);
+  Buffer.from(res).toString(); // Hello zstd!!
+})();
+```
+
 ### without bundlers
 
 ``` js
