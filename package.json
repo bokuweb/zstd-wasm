@@ -44,7 +44,7 @@
     "html-webpack-plugin": "3.2.0",
     "jest": "27.0.3",
     "text-encoding": "0.7.0",
-    "ts-jest": "27.0.3",
+    "ts-jest": "27.0.4",
     "ts-loader": "8.3.0",
     "typescript": "4.3.2",
     "webpack": "4.46.0",
