@@ -63,6 +63,9 @@ In this case, please install `file-loader` by yourserlf.
 ``` js
 {
   // ...snipped
+  node: {
+    fs: 'empty',
+  },  
   module: {
     rules: [
       {
