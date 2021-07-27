@@ -40,7 +40,6 @@
     "@types/benchmark": "2.1.1",
     "@types/jest": "26.0.24",
     "@types/node": "15.6.1",
-    "@webassemblyjs/wasm-opt": "^1.11.1",
     "benchmark": "2.1.4",
     "copy-webpack-plugin": "6.4.1",
     "file-loader": "6.2.0",
