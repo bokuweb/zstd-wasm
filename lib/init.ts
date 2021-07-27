@@ -23,7 +23,6 @@ export const init = async (path?: string) => {
     var url = require('./wasm/zstd.wasm');
     Module['init'](path ?? url.default ?? url);
   }
-  Module['init'](path);
   await waitInitialized();
 };
 

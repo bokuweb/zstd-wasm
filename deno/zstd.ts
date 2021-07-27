@@ -32,7 +32,7 @@ const compressBound = (size: number): number => {
   return bound(size);
 };
 
-export const compress = (buf: ArrayBuffer, level: number) => {
+export const compress = (buf: ArrayBuffer, level?: number) => {
   const bound = compressBound(buf.byteLength);
   const malloc = Module["_malloc"];
   const compressed = malloc(bound);
@@ -54,7 +54,7 @@ export const compress = (buf: ArrayBuffer, level: number) => {
       bound,
       src,
       buf.byteLength,
-      level
+      level ?? 3
     );
     if (isError(sizeOrError)) {
       throw new Error(`Failed to compress with code ${sizeOrError}`);
