@@ -139,6 +139,7 @@ import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 ### async init(path?: string): Promise<void>
 
 Initialize module.
+Please specify path to `zstd.wasm` without bunders on browser.
 
 ### compress(buffer: ArrayBuffer, compressionLevel: number): ArrayBuffer
 
