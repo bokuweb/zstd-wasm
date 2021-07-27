@@ -31,9 +31,11 @@ export const compress = (buf: ArrayBuffer, level: number) => {
     // // Uint8Array.prototype.slice() return copied buffer.
     const data = new Uint8Array(Module.HEAPU8.buffer, compressed, sizeOrError).slice();
     free(compressed, bound);
+    free(src, buf.byteLength);
     return data;
   } catch (e) {
     free(compressed, bound);
+    free(src, buf.byteLength);
     throw e;
   }
 };
