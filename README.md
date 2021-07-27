@@ -2,6 +2,9 @@
 
 <img src="https://github.com/bokuweb/zstd-wasm/workflows/Continuous%20Integration/badge.svg" alt="Build Status" />
 
+Zstandard for browser, Node.js and Deno.
+For now support only simple API.
+
 ## installation
 
 ```
