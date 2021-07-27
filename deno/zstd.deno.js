@@ -7,93 +7,8 @@ for (key in Module) {
   }
 }
 var arguments_ = [];
-var IS_WEB = typeof window === 'object';
-var IS_WORKER = typeof importScripts === 'function';
-var IS_NODE =
-  typeof process === 'object' && typeof process.versions === 'object' && typeof process.versions.node === 'string';
-var scriptDirectory = '';
-var read_, readAsync, readBinary;
-var nodeFS;
-var nodePath;
-if (IS_NODE) {
-  if (IS_WORKER) {
-    scriptDirectory = require('path').dirname(scriptDirectory) + '/';
-  } else {
-    scriptDirectory = __dirname + '/';
-  }
-  read_ = function (filename, binary) {
-    if (!nodeFS) nodeFS = require('fs');
-    if (!nodePath) nodePath = require('path');
-    filename = nodePath['resolve'](__dirname, filename);
-    return nodeFS['readFileSync'](filename, binary ? null : 'utf8');
-  };
-  readBinary = function readBinary(filename) {
-    var ret = read_(filename, true);
-    if (!ret.buffer) {
-      ret = new Uint8Array(ret);
-    }
-    assert(ret.buffer);
-    return ret;
-  };
-  if (process['argv'].length > 1) {
-    thisProgram = process['argv'][1].replace(/\\/g, '/');
-  }
-  arguments_ = process['argv'].slice(2);
-  if (typeof module !== 'undefined') {
-    module['exports'] = Module;
-  }
-  process['on']('uncaughtException', function (ex) {
-    if (!(ex instanceof ExitStatus)) {
-      throw ex;
-    }
-  });
-  process['on']('unhandledRejection', abort);
-  quit_ = function (status) {
-    process['exit'](status);
-  };
-} else if (IS_WEB || IS_WORKER) {
-  if (IS_WORKER) {
-    scriptDirectory = self.location.href;
-  } else if (typeof document !== 'undefined' && document.currentScript) {
-    scriptDirectory = document.currentScript.src;
-  }
-  if (scriptDirectory.indexOf('blob:') !== 0) {
-    scriptDirectory = scriptDirectory.substr(0, scriptDirectory.lastIndexOf('/') + 1);
-  } else {
-    scriptDirectory = '';
-  }
-  {
-    read_ = function (url) {
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', url, false);
-      xhr.send(null);
-      return xhr.responseText;
-    };
-    if (IS_WORKER) {
-      readBinary = function (url) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', url, false);
-        xhr.responseType = 'arraybuffer';
-        xhr.send(null);
-        return new Uint8Array(xhr.response);
-      };
-    }
-    readAsync = function (url, onload, onerror) {
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', url, true);
-      xhr.responseType = 'arraybuffer';
-      xhr.onload = function () {
-        if (xhr.status == 200 || (xhr.status == 0 && xhr.response)) {
-          onload(xhr.response);
-          return;
-        }
-        onerror();
-      };
-      xhr.onerror = onerror;
-      xhr.send(null);
-    };
-  }
-}
+var runtimeInitialized;
+
 var err = Module['printErr'] || console.warn.bind(console);
 for (key in moduleOverrides) {
   if (moduleOverrides.hasOwnProperty(key)) {
@@ -104,10 +19,10 @@ moduleOverrides = null;
 if (Module['arguments']) arguments_ = Module['arguments'];
 if (Module['thisProgram']) thisProgram = Module['thisProgram'];
 if (Module['quit']) quit_ = Module['quit'];
+var tempRet0;
 var setTempRet0 = function (value) {
   tempRet0 = value;
 };
-var wasmBinary;
 if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
 if (typeof WebAssembly !== 'object') {
   abort('no native wasm support detected');
@@ -119,16 +34,68 @@ function assert(condition, text) {
     abort('Assertion failed: ' + text);
   }
 }
+function getCFunc(ident) {
+  var func = Module['_' + ident];
+  assert(func, 'Cannot call unknown function ' + ident + ', make sure it is exported');
+  return func;
+}
+function ccall(ident, returnType, argTypes, args, opts) {
+  var toC = {
+    array: function (arr) {
+      var ret = stackAlloc(arr.length);
+      writeArrayToMemory(arr, ret);
+      return ret;
+    },
+  };
+  function convertReturnValue(ret) {
+    if (returnType === 'boolean') return Boolean(ret);
+    return ret;
+  }
+  var func = getCFunc(ident);
+  var cArgs = [];
+  var stack = 0;
+  if (args) {
+    for (var i = 0; i < args.length; i++) {
+      var converter = toC[argTypes[i]];
+      if (converter) {
+        if (stack === 0) stack = stackSave();
+        cArgs[i] = converter(args[i]);
+      } else {
+        cArgs[i] = args[i];
+      }
+    }
+  }
+  var ret = func.apply(null, cArgs);
+  ret = convertReturnValue(ret);
+  if (stack !== 0) stackRestore(stack);
+  return ret;
+}
+function cwrap(ident, returnType, argTypes, opts) {
+  argTypes = argTypes || [];
+  var numericArgs = argTypes.every(function (type) {
+    return type === 'number';
+  });
+  var numericRet = returnType !== 'string';
+  if (numericRet && numericArgs && !opts) {
+    return getCFunc(ident);
+  }
+  return function () {
+    return ccall(ident, returnType, argTypes, arguments, opts);
+  };
+}
+function writeArrayToMemory(array, buffer) {
+  HEAP8.set(array, buffer);
+}
 function alignUp(x, multiple) {
   if (x % multiple > 0) {
     x += multiple - (x % multiple);
   }
   return x;
 }
-var buffer, HEAPU8;
+var buffer, HEAP8, HEAPU8;
 function updateGlobalBufferAndViews(buf) {
   buffer = buf;
-  Module['HEAP8'] = new Int8Array(buf);
+  Module['HEAP8'] = HEAP8 = new Int8Array(buf);
   Module['HEAPU8'] = HEAPU8 = new Uint8Array(buf);
 }
 var wasmTable;
@@ -173,62 +140,12 @@ function abort(what) {
   what += '';
   err(what);
   ABORT = true;
-  what = 'abort(' + what + ').';
+  what = 'abort(' + what + '). Build with -s ASSERTIONS=1 for more info.';
   var e = new WebAssembly.RuntimeError(what);
   throw e;
 }
-function isFileURI(filename) {
-  return filename.startsWith('file://');
-}
 
-var url = !IS_NODE && require('./zstd.wasm');
-var binFile = IS_NODE ? 'zstd.wasm' : url.default || url;
-function getBinary(file) {
-  try {
-    if (file == binFile && wasmBinary) {
-      return new Uint8Array(wasmBinary);
-    }
-    if (readBinary) {
-      return readBinary(file);
-    } else {
-      throw 'both async and sync fetching of the wasm failed';
-    }
-  } catch (err) {
-    abort(err);
-  }
-}
-function getBinaryPromise() {
-  if (!wasmBinary && (IS_WEB || IS_WORKER)) {
-    if (typeof fetch === 'function' && !isFileURI(binFile)) {
-      return fetch(binFile, { credentials: 'same-origin' })
-        .then(function (response) {
-          if (!response['ok']) {
-            throw "failed to load wasm binary file at '" + binFile + "'";
-          }
-          return response['arrayBuffer']();
-        })
-        .catch(function () {
-          return getBinary(binFile);
-        });
-    } else {
-      if (readAsync) {
-        return new Promise(function (resolve, reject) {
-          readAsync(
-            binFile,
-            function (response) {
-              resolve(new Uint8Array(response));
-            },
-            reject,
-          );
-        });
-      }
-    }
-  }
-  return Promise.resolve().then(function () {
-    return getBinary(binFile);
-  });
-}
-function init(filePath) {
+function init(bin) {
   var info = { a: asmLibraryArg };
   function receiveInstance(instance) {
     var exports = instance.exports;
@@ -244,34 +161,13 @@ function init(filePath) {
     receiveInstance(result['instance']);
   }
   function instantiateArrayBuffer(receiver) {
-    return getBinaryPromise()
-      .then(function (binary) {
-        var result = WebAssembly.instantiate(binary, info);
-        return result;
-      })
-      .then(receiver, function (reason) {
-        err('failed to asynchronously prepare wasm: ' + reason);
-        abort(reason);
-      });
+    return WebAssembly.instantiate(bin, info).then(receiver, function (reason) {
+      err('failed to asynchronously prepare wasm: ' + reason);
+      abort(reason);
+    });
   }
   function instantiateAsync() {
-    if (
-      !wasmBinary &&
-      typeof WebAssembly.instantiateStreaming === 'function' &&
-      (typeof filePath === 'string' || !isFileURI(binFile)) &&
-      typeof fetch === 'function'
-    ) {
-      return fetch(filePath || binFile, { credentials: 'same-origin' }).then(function (response) {
-        var result = WebAssembly.instantiateStreaming(response, info);
-        return result.then(receiveInstantiationResult, function (reason) {
-          err('wasm streaming compile failed: ' + reason);
-          err('falling back to ArrayBuffer instantiation');
-          return instantiateArrayBuffer(receiveInstantiationResult);
-        });
-      });
-    } else {
-      return instantiateArrayBuffer(receiveInstantiationResult);
-    }
+    return instantiateArrayBuffer(receiveInstantiationResult);
   }
   if (Module['instantiateWasm']) {
     try {
@@ -363,12 +259,17 @@ Module['_ZSTD_getFrameContentSize'] = function () {
 Module['_ZSTD_decompress'] = function () {
   return (Module['_ZSTD_decompress'] = Module['asm']['m']).apply(null, arguments);
 };
+var stackSave = (Module['stackSave'] = function () {
+  return (stackSave = Module['stackSave'] = Module['asm']['n']).apply(null, arguments);
+});
+var stackRestore = (Module['stackRestore'] = function () {
+  return (stackRestore = Module['stackRestore'] = Module['asm']['o']).apply(null, arguments);
+});
+var stackAlloc = (Module['stackAlloc'] = function () {
+  return (stackAlloc = Module['stackAlloc'] = Module['asm']['p']).apply(null, arguments);
+});
+Module['cwrap'] = cwrap;
 var calledRun;
-function ExitStatus(status) {
-  this.name = 'ExitStatus';
-  this.message = 'Program terminated with exit(' + status + ')';
-  this.status = status;
-}
 dependenciesFulfilled = function runCaller() {
   if (!calledRun) run();
   if (!calledRun) dependenciesFulfilled = runCaller;
@@ -392,4 +293,4 @@ function run(args) {
   doRun();
 }
 Module['init'] = init;
-module.exports = Module;
+export default Module;

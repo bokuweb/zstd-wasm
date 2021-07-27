@@ -119,5 +119,7 @@ dist
 .pnp.*
 
 zstd
-./zstd.js
-./zstd.wasm
+zstd.js
+zstd.wasm
+zstd.c
+.DS_Store

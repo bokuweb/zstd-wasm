@@ -1,16 +1,18 @@
 import { Module } from '../init';
-import { isError, getErrorName } from '../errors';
+import { isError } from '../errors';
 
 const compressBound = (size: number): number => {
-  const bound = Module.cwrap('ZSTD_compressBound', 'number', ['number']);
+  const bound = Module['_ZSTD_compressBound'];
   return bound(size);
 };
 
 export const compress = (buf: ArrayBuffer, level: number) => {
   const bound = compressBound(buf.byteLength);
-  const malloc = Module.cwrap('malloc', 'number', ['number']);
+  const malloc = Module['_malloc'];
   const compressed = malloc(bound);
-  const free = Module.cwrap('free', 'number');
+  const src = malloc(buf.byteLength);
+  Module.HEAP8.set(buf, src);
+  const free = Module['_free'];
   try {
     /*
       @See https://zstd.docsforge.com/dev/api/ZSTD_compress/
@@ -20,18 +22,20 @@ export const compress = (buf: ArrayBuffer, level: number) => {
       @return : compressed size written into `dst` (<= `dstCapacity),
                 or an error code if it fails (which can be tested using ZSTD_isError()).
     */
-    const _compress = Module.cwrap('ZSTD_compress', 'number', ['number', 'number', 'array', 'number', 'number']);
-    const sizeOrError = _compress(compressed, bound, buf, buf.byteLength, level);
+    const _compress = Module['_ZSTD_compress'];
+    const sizeOrError = _compress(compressed, bound, src, buf.byteLength, level);
     if (isError(sizeOrError)) {
-      throw new Error(getErrorName(sizeOrError));
+      throw new Error(`Failed to compress with code ${sizeOrError}`);
     }
     // // Copy buffer
     // // Uint8Array.prototype.slice() return copied buffer.
     const data = new Uint8Array(Module.HEAPU8.buffer, compressed, sizeOrError).slice();
     free(compressed, bound);
+    free(src, buf.byteLength);
     return data;
   } catch (e) {
     free(compressed, bound);
+    free(src, buf.byteLength);
     throw e;
   }
 };
