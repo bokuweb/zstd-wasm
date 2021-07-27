@@ -2,23 +2,6 @@ name: Continuous Integration
 on: [push, pull_request]
 
 jobs:
-  # lint:
-  #   runs-on: ubuntu-18.04
-  #   steps:
-  #     - uses: actions/checkout@master
-  #     - uses: actions/setup-node@master
-  #       with:
-  #         node-version: 12
-  #     - name: Set GitHub SSH Key
-  #       env:
-  #           SSH_KEY: ${{ secrets.SSH_KEY }}
-  #       run: |
-  #           sh ./set_key_actions.sh
-  #     - name: yarn
-  #       run: yarn --frozen-lockfile
-  #     - name: lint
-  #       run: yarn lint && yarn -s format:ci -l
-
   tsc:
     runs-on: ubuntu-18.04
     steps:
@@ -42,3 +25,13 @@ jobs:
         run: yarn --frozen-lockfile
       - name: test
         run: yarn test
+
+  deno:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@master
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      - name: test
+        run: deno test deno
