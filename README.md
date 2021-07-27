@@ -24,6 +24,21 @@ const { init, compress, decompress } = require('@bokuweb/zstd-wasm');
 })();
 ```
 
+### Deno
+
+See also, https://github.com/bokuweb/zstd-wasm/tree/master/examples/deno
+
+``` ts
+import { init, decompress, compress } from 'https://deno.land/x/zstd_wasm@0.0.11/deno/zstd.ts';
+
+await init();
+const encoder = new TextEncoder();
+const buffer = encoder.encode('Hello World');
+const compressed = compress(buffer, 10);
+const decompressed = decompress(compressed);
+const decoder = new TextDecoder();
+console.log(decoder.decode(decompressed));
+```
 ### without bundlers
 
 ``` js
@@ -109,6 +124,12 @@ import { init, compress, decompress } from '@bokuweb/zstd-wasm';
         type: 'asset/resource',
       },
     ],
+  },
+  resolve: {
+    // ...snipped
+    fallback: {
+      fs: false,
+    },
   },
 }
 ```
