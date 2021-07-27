@@ -9,6 +9,7 @@
   "browser": "dist/web/lib/index.js",
   "types": "dist/web/lib/index.d.ts",
   "scripts": {
+    "largefile": "yes \"Hello\" | head -n 20000000 > ./test/large-file",
     "tsc": "tsc -p tsconfig.json --skipLibCheck",
     "tsc:web": "tsc -p tsconfig.web.json --skipLibCheck",
     "copy:wasm:web": "cp -r ./lib/wasm dist/web/lib",
@@ -26,7 +27,7 @@
     "prepublishOnly": "npm run build:js",
     "build:wasm": "docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk emcc zstd.c -flto -o ./zstd.js -O3 --memory-init-file 0 --post-js export_module.js -s EXPORTED_FUNCTIONS=\"['_ZSTD_isError', '_ZSTD_getFrameContentSize', '_ZSTD_getErrorName', '_ZSTD_decompress', '_ZSTD_compress', '_ZSTD_compressBound', '_malloc', '_free']\" -s EXPORTED_RUNTIME_METHODS=\"['cwrap']\" -s FILESYSTEM=0 -s ALLOW_MEMORY_GROWTH=1",
     "build": "npm run build:was && npm run build:js",
-    "test": "jest"
+    "test": "npm run largefile && jest && rm ./test/large-file"
   },
   "publishConfig": {
     "access": "public"

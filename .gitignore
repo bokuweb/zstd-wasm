@@ -122,3 +122,4 @@ zstd
 zstd.js
 zstd.wasm
 zstd.c
+.DS_Store
