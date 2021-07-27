@@ -17,6 +17,7 @@
     "tsc:node": "tsc -p tsconfig.node.json --skipLibCheck",
     "copy:wasm:node": "cp -r ./lib/wasm dist/node/lib",
     "build:node": "npm run tsc:node && npm run copy:wasm:node",
+    "build:deno": "node tools/deno.js && cp ./lib/wasm/zstd.wasm deno/zstd.wasm",
     "bundle": "webpack",
     "serve": "webpack-dev-server",
     "benchmark": "npx ts-node ./benchmark/index.ts",
@@ -40,8 +41,10 @@
     "@types/jest": "26.0.24",
     "@types/node": "15.6.1",
     "benchmark": "2.1.4",
+    "prettier": "^2.3.2",
     "copy-webpack-plugin": "6.4.1",
     "file-loader": "6.2.0",
+    "glob-all": "^3.2.1",
     "html-webpack-plugin": "3.2.0",
     "jest": "27.0.6",
     "text-encoding": "0.7.0",
@@ -51,5 +54,7 @@
     "webpack": "4.46.0",
     "webpack-cli": "3.3.12",
     "webpack-dev-server": "3.11.2"
+  },
+  "dependencies": {
   }
 }
