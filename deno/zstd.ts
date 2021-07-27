@@ -1,8 +1,7 @@
 
-import * as path from 'https://deno.land/std/path/mod.ts';
+import { decode } from "https://deno.land/std/encoding/base64.ts"
+import { wasm } from "./zstd.encoded.wasm.ts"
 import Module from './zstd.deno.js';
-
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const initialized = (() =>
   new Promise<void>((resolve) => {
@@ -10,8 +9,7 @@ const initialized = (() =>
   }))();
 
 export const init = async () => {
-  const p = path.join(__dirname, 'zstd.wasm');
-  const bytes = Deno.readFileSync(p);
+  const bytes = decode(wasm);
   Module['init'](bytes);
   await initialized;
 };

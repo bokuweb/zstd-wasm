@@ -17,7 +17,7 @@
     "tsc:node": "tsc -p tsconfig.node.json --skipLibCheck",
     "copy:wasm:node": "cp -r ./lib/wasm dist/node/lib",
     "build:node": "npm run tsc:node && npm run copy:wasm:node",
-    "build:deno": "node tools/deno.js && cp ./lib/wasm/zstd.wasm deno/zstd.wasm",
+    "build:deno": "node tools/deno.js",
     "bundle": "webpack",
     "serve": "webpack-dev-server",
     "benchmark": "npx ts-node ./benchmark/index.ts",
