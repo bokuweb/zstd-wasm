@@ -1,6 +1,3 @@
-const { readFileSync } = require('fs');
-const { resolve } = require('path');
-
 const Module = require('./wasm/zstd.js');
 
 const IS_NODE =
@@ -17,6 +14,8 @@ export const waitInitialized = async () => {
 
 export const init = async (path?: string) => {
   if (IS_NODE) {
+    const { readFileSync } = require('fs');
+    const { resolve } = require('path');
     const buf = readFileSync(resolve(__dirname, './wasm/zstd.wasm'));
     Module['init'](buf);
   } else {
