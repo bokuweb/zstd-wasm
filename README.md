@@ -141,7 +141,7 @@ import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 Initialize module.
 Please specify path to `zstd.wasm` without bunders on browser.
 
-### compress(buffer: ArrayBuffer, compressionLevel: number): ArrayBuffer
+### compress(buffer: ArrayBuffer, compressionLevel?: number): ArrayBuffer
 
 - buffer: data to compress.
 - compressionLevel: (optional) compression level, default value is 3

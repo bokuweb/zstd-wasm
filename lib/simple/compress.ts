@@ -6,7 +6,7 @@ const compressBound = (size: number): number => {
   return bound(size);
 };
 
-export const compress = (buf: ArrayBuffer, level: number) => {
+export const compress = (buf: ArrayBuffer, level?: number) => {
   const bound = compressBound(buf.byteLength);
   const malloc = Module['_malloc'];
   const compressed = malloc(bound);
@@ -23,7 +23,7 @@ export const compress = (buf: ArrayBuffer, level: number) => {
                 or an error code if it fails (which can be tested using ZSTD_isError()).
     */
     const _compress = Module['_ZSTD_compress'];
-    const sizeOrError = _compress(compressed, bound, src, buf.byteLength, level);
+    const sizeOrError = _compress(compressed, bound, src, buf.byteLength, level ?? 3);
     if (isError(sizeOrError)) {
       throw new Error(`Failed to compress with code ${sizeOrError}`);
     }
