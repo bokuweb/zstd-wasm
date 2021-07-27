@@ -20,7 +20,7 @@ const hello = 'KLUv/SQMYQAASGVsbG8genN0ZCEhN2g+CQ==';
     console.log(`%c${str}`, 'color: lightgreen;');
     console.log('%cSucceeded to compressAndDecompressTest.', 'color: lightgreen;');
   };
-  await init('./zstd.wasm');
+  await init();
   await decompressTest();
   await compressAndDecompressTest();
 })();
