@@ -1,4 +1,4 @@
-import { init, decompress, compress } from '../../deno/index.ts';
+import { init, decompress, compress } from '../../deno/zstd.ts';
 
 await init();
 const encoder = new TextEncoder();
