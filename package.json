@@ -37,7 +37,7 @@
   ],
   "devDependencies": {
     "@types/benchmark": "2.1.0",
-    "@types/jest": "26.0.23",
+    "@types/jest": "26.0.24",
     "@types/node": "15.6.1",
     "benchmark": "2.1.4",
     "copy-webpack-plugin": "6.4.1",
