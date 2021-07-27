@@ -33,5 +33,7 @@ jobs:
       - uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
+      - name: run example
+        run: deno test deno
       - name: test
         run: deno test deno

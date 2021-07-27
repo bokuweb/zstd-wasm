@@ -29,7 +29,7 @@ const { init, compress, decompress } = require('@bokuweb/zstd-wasm');
 See also, https://github.com/bokuweb/zstd-wasm/tree/master/examples/deno
 
 ``` ts
-import { init, decompress, compress } from 'https://deno.land/x/zstd_wasm@0.0.11/deno/zstd.ts';
+import { init, decompress, compress } from 'https://deno.land/x/zstd_wasm/deno/zstd.ts';
 
 await init();
 const encoder = new TextEncoder();
@@ -132,6 +132,33 @@ import { init, compress, decompress } from '@bokuweb/zstd-wasm';
     },
   },
 }
+```
+
+## API
+
+### async init(path?: string): Promise<void>
+
+Initialize module.
+
+### compress(buffer: ArrayBuffer, compressionLevel: number): ArrayBuffer
+
+- buffer: data to compress.
+- compressionLevel: (optional) compression level, default value is 3
+
+**Example:**
+
+```typescript
+const compressed = compress(buffer, 10);
+```
+
+### decompress(buffer: ArrayBuffer): ArrayBuffer
+
+- buffer: data to decompress.
+
+**Example:**
+
+```typescript
+const decompressed = decompress(buffer);
 ```
 
 ## License
