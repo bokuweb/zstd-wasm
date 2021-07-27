@@ -18,5 +18,5 @@
     "declaration": true,
     "forceConsistentCasingInFileNames": true
   },
-  "exclude": ["example", "benchmark", "test"]
+  "exclude": ["examples", "benchmark", "test", "deno"]
 }
