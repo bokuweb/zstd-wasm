@@ -1,6 +1,6 @@
 import { decompress } from '../lib/simple/decompress';
 import { compress } from '../lib/simple/compress';
-import { init } from '../lib/init';
+import { init } from '../lib/index.node';
 
 test('hello', async () => {
   await init();

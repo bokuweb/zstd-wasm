@@ -1,4 +1,4 @@
-import { init, compress, decompress } from '../lib/index';
+import { init, compress, decompress } from '../lib/index.web';
 
 const hello = 'KLUv/SQMYQAASGVsbG8genN0ZCEhN2g+CQ==';
 
