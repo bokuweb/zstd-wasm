@@ -1,5 +1,5 @@
 import { decompress } from '../lib/simple/decompress';
-import { init } from '../lib/init';
+import { init } from '../lib/index.node';
 
 test('decompress multiple json', async () => {
   const dataA =

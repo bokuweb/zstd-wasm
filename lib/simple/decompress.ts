@@ -1,4 +1,4 @@
-import { Module } from '../init';
+import { Module } from '../module';
 import { isError } from '../errors';
 
 const getFrameContentSize = (src: number, size: number): number => {

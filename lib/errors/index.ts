@@ -1,4 +1,4 @@
-import { Module } from '../init';
+import { Module } from '../module';
 
 export const isError = (code: number): number => {
   const _isError = Module['_ZSTD_isError'];

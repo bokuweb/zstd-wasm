@@ -4,7 +4,7 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: {
-    index: [path.resolve(__dirname, 'example/index.ts')],
+    index: [path.resolve(__dirname, 'examples/index.ts')],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),

@@ -3,7 +3,9 @@ const glob = require('glob-all');
 const { readFileSync, writeFileSync } = require('fs');
 
 // Ignore index.ts/init.ts
-const files = glob.sync('./lib/**/*.ts').filter((name) => name !== './lib/index.ts' && name !== './lib/init.ts');
+const files = glob
+  .sync('./lib/**/*.ts')
+  .filter((name) => name !== './lib/index.web.ts' && name !== './lib/module.ts' && name !== './lib/index.node.ts');
 
 console.log(files);
 

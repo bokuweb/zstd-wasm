@@ -7,8 +7,6 @@ for (key in Module) {
   }
 }
 var arguments_ = [];
-var runtimeInitialized;
-
 var err = Module['printErr'] || console.warn.bind(console);
 for (key in moduleOverrides) {
   if (moduleOverrides.hasOwnProperty(key)) {
@@ -19,11 +17,10 @@ moduleOverrides = null;
 if (Module['arguments']) arguments_ = Module['arguments'];
 if (Module['thisProgram']) thisProgram = Module['thisProgram'];
 if (Module['quit']) quit_ = Module['quit'];
-var tempRet0;
+var tempRet0 = 0;
 var setTempRet0 = function (value) {
   tempRet0 = value;
 };
-if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
 if (typeof WebAssembly !== 'object') {
   abort('no native wasm support detected');
 }
@@ -34,89 +31,65 @@ function assert(condition, text) {
     abort('Assertion failed: ' + text);
   }
 }
-function getCFunc(ident) {
-  var func = Module['_' + ident];
-  assert(func, 'Cannot call unknown function ' + ident + ', make sure it is exported');
-  return func;
-}
-function ccall(ident, returnType, argTypes, args, opts) {
-  var toC = {
-    array: function (arr) {
-      var ret = stackAlloc(arr.length);
-      writeArrayToMemory(arr, ret);
-      return ret;
-    },
-  };
-  function convertReturnValue(ret) {
-    if (returnType === 'boolean') return Boolean(ret);
-    return ret;
-  }
-  var func = getCFunc(ident);
-  var cArgs = [];
-  var stack = 0;
-  if (args) {
-    for (var i = 0; i < args.length; i++) {
-      var converter = toC[argTypes[i]];
-      if (converter) {
-        if (stack === 0) stack = stackSave();
-        cArgs[i] = converter(args[i]);
-      } else {
-        cArgs[i] = args[i];
-      }
-    }
-  }
-  var ret = func.apply(null, cArgs);
-  ret = convertReturnValue(ret);
-  if (stack !== 0) stackRestore(stack);
-  return ret;
-}
-function cwrap(ident, returnType, argTypes, opts) {
-  argTypes = argTypes || [];
-  var numericArgs = argTypes.every(function (type) {
-    return type === 'number';
-  });
-  var numericRet = returnType !== 'string';
-  if (numericRet && numericArgs && !opts) {
-    return getCFunc(ident);
-  }
-  return function () {
-    return ccall(ident, returnType, argTypes, arguments, opts);
-  };
-}
-function writeArrayToMemory(array, buffer) {
-  HEAP8.set(array, buffer);
-}
 function alignUp(x, multiple) {
   if (x % multiple > 0) {
     x += multiple - (x % multiple);
   }
   return x;
 }
-var buffer, HEAP8, HEAPU8;
+var buffer, HEAPU8;
 function updateGlobalBufferAndViews(buf) {
   buffer = buf;
-  Module['HEAP8'] = HEAP8 = new Int8Array(buf);
+  Module['HEAP8'] = new Int8Array(buf);
   Module['HEAPU8'] = HEAPU8 = new Uint8Array(buf);
 }
+var INITIAL_MEMORY = Module['INITIAL_MEMORY'] || 16777216;
 var wasmTable;
+var __ATPRERUN__ = [];
 var __ATINIT__ = [];
+var __ATPOSTRUN__ = [];
+var runtimeInitialized = false;
+function preRun() {
+  if (Module['preRun']) {
+    if (typeof Module['preRun'] == 'function') Module['preRun'] = [Module['preRun']];
+    while (Module['preRun'].length) {
+      addOnPreRun(Module['preRun'].shift());
+    }
+  }
+  callRuntimeCallbacks(__ATPRERUN__);
+}
 function initRuntime() {
   runtimeInitialized = true;
   callRuntimeCallbacks(__ATINIT__);
 }
+function postRun() {
+  if (Module['postRun']) {
+    if (typeof Module['postRun'] == 'function') Module['postRun'] = [Module['postRun']];
+    while (Module['postRun'].length) {
+      addOnPostRun(Module['postRun'].shift());
+    }
+  }
+  callRuntimeCallbacks(__ATPOSTRUN__);
+}
+function addOnPreRun(cb) {
+  __ATPRERUN__.unshift(cb);
+}
 function addOnInit(cb) {
   __ATINIT__.unshift(cb);
+}
+function addOnPostRun(cb) {
+  __ATPOSTRUN__.unshift(cb);
 }
 var runDependencies = 0;
 var runDependencyWatcher = null;
 var dependenciesFulfilled = null;
-function addRunDependency() {
+function addRunDependency(id) {
   runDependencies++;
   if (Module['monitorRunDependencies']) {
     Module['monitorRunDependencies'](runDependencies);
   }
 }
-function removeRunDependency() {
+function removeRunDependency(id) {
   runDependencies--;
   if (Module['monitorRunDependencies']) {
     Module['monitorRunDependencies'](runDependencies);
@@ -133,6 +106,8 @@ function removeRunDependency() {
     }
   }
 }
+Module['preloadedImages'] = {};
+Module['preloadedAudios'] = {};
 function abort(what) {
   if (Module['onAbort']) {
     Module['onAbort'](what);
@@ -140,20 +115,30 @@ function abort(what) {
   what += '';
   err(what);
   ABORT = true;
-  what = 'abort(' + what + '). Build with -s ASSERTIONS=1 for more info.';
+  EXITSTATUS = 1;
+  what = 'abort(' + what + ').';
   var e = new WebAssembly.RuntimeError(what);
   throw e;
 }
 
-function init(bin) {
+function getBinaryPromise(url) {
+  return fetch(url, { credentials: 'same-origin' }).then(function (response) {
+    if (!response['ok']) {
+      throw "failed to load wasm binary file at '" + url + "'";
+    }
+    return response['arrayBuffer']();
+  });
+}
+
+function init(filePathOrBuf) {
   var info = { a: asmLibraryArg };
-  function receiveInstance(instance) {
+  function receiveInstance(instance, module) {
     var exports = instance.exports;
     Module['asm'] = exports;
-    wasmMemory = Module['asm']['d'];
+    wasmMemory = Module['asm']['c'];
     updateGlobalBufferAndViews(wasmMemory.buffer);
-    wasmTable = Module['asm']['q'];
-    addOnInit(Module['asm']['e']);
+    wasmTable = Module['asm']['l'];
+    addOnInit(Module['asm']['d']);
     removeRunDependency('wasm-instantiate');
   }
   addRunDependency('wasm-instantiate');
@@ -161,13 +146,37 @@ function init(bin) {
     receiveInstance(result['instance']);
   }
   function instantiateArrayBuffer(receiver) {
-    return WebAssembly.instantiate(bin, info).then(receiver, function (reason) {
-      err('failed to asynchronously prepare wasm: ' + reason);
-      abort(reason);
-    });
+    return getBinaryPromise(filePathOrBuf)
+      .then(function (binary) {
+        var result = WebAssembly.instantiate(binary, info);
+        return result;
+      })
+      .then(receiver, function (reason) {
+        err('failed to asynchronously prepare wasm: ' + reason);
+        abort(reason);
+      });
   }
   function instantiateAsync() {
-    return instantiateArrayBuffer(receiveInstantiationResult);
+    if (filePathOrBuf && filePathOrBuf.byteLength > 0) {
+      return WebAssembly.instantiate(filePathOrBuf, info).then(receiveInstantiationResult, function (reason) {
+        err('wasm compile failed: ' + reason);
+      });
+    } else if (
+      typeof WebAssembly.instantiateStreaming === 'function' &&
+      typeof filePathOrBuf === 'string' &&
+      typeof fetch === 'function'
+    ) {
+      return fetch(filePathOrBuf, { credentials: 'same-origin' }).then(function (response) {
+        var result = WebAssembly.instantiateStreaming(response, info);
+        return result.then(receiveInstantiationResult, function (reason) {
+          err('wasm streaming compile failed: ' + reason);
+          err('falling back to ArrayBuffer instantiation');
+          return instantiateArrayBuffer(receiveInstantiationResult);
+        });
+      });
+    } else {
+      return instantiateArrayBuffer(receiveInstantiationResult);
+    }
   }
   if (Module['instantiateWasm']) {
     try {
@@ -200,9 +209,6 @@ function callRuntimeCallbacks(callbacks) {
     }
   }
 }
-function _emscripten_memcpy_big(dest, src, num) {
-  HEAPU8.copyWithin(dest, src, src + num);
-}
 function emscripten_realloc_buffer(size) {
   try {
     wasmMemory.grow((size - buffer.byteLength + 65535) >>> 16);
@@ -231,44 +237,32 @@ function _emscripten_resize_heap(requestedSize) {
 function _setTempRet0(val) {
   setTempRet0(val);
 }
-var asmLibraryArg = { c: _emscripten_memcpy_big, a: _emscripten_resize_heap, b: _setTempRet0 };
+var asmLibraryArg = { a: _emscripten_resize_heap, b: _setTempRet0 };
 Module['___wasm_call_ctors'] = function () {
-  return (Module['___wasm_call_ctors'] = Module['asm']['e']).apply(null, arguments);
+  return (Module['___wasm_call_ctors'] = Module['asm']['d']).apply(null, arguments);
 };
 Module['_malloc'] = function () {
-  return (Module['_malloc'] = Module['asm']['f']).apply(null, arguments);
+  return (Module['_malloc'] = Module['asm']['e']).apply(null, arguments);
 };
 Module['_free'] = function () {
-  return (Module['_free'] = Module['asm']['g']).apply(null, arguments);
+  return (Module['_free'] = Module['asm']['f']).apply(null, arguments);
 };
 Module['_ZSTD_isError'] = function () {
-  return (Module['_ZSTD_isError'] = Module['asm']['h']).apply(null, arguments);
-};
-Module['_ZSTD_getErrorName'] = function () {
-  return (Module['_ZSTD_getErrorName'] = Module['asm']['i']).apply(null, arguments);
+  return (Module['_ZSTD_isError'] = Module['asm']['g']).apply(null, arguments);
 };
 Module['_ZSTD_compressBound'] = function () {
-  return (Module['_ZSTD_compressBound'] = Module['asm']['j']).apply(null, arguments);
+  return (Module['_ZSTD_compressBound'] = Module['asm']['h']).apply(null, arguments);
 };
 Module['_ZSTD_compress'] = function () {
-  return (Module['_ZSTD_compress'] = Module['asm']['k']).apply(null, arguments);
+  return (Module['_ZSTD_compress'] = Module['asm']['i']).apply(null, arguments);
 };
 Module['_ZSTD_getFrameContentSize'] = function () {
-  return (Module['_ZSTD_getFrameContentSize'] = Module['asm']['l']).apply(null, arguments);
+  return (Module['_ZSTD_getFrameContentSize'] = Module['asm']['j']).apply(null, arguments);
 };
 Module['_ZSTD_decompress'] = function () {
-  return (Module['_ZSTD_decompress'] = Module['asm']['m']).apply(null, arguments);
+  return (Module['_ZSTD_decompress'] = Module['asm']['k']).apply(null, arguments);
 };
-var stackSave = (Module['stackSave'] = function () {
-  return (stackSave = Module['stackSave'] = Module['asm']['n']).apply(null, arguments);
-});
-var stackRestore = (Module['stackRestore'] = function () {
-  return (stackRestore = Module['stackRestore'] = Module['asm']['o']).apply(null, arguments);
-});
-var stackAlloc = (Module['stackAlloc'] = function () {
-  return (stackAlloc = Module['stackAlloc'] = Module['asm']['p']).apply(null, arguments);
-});
-Module['cwrap'] = cwrap;
+
 var calledRun;
 dependenciesFulfilled = function runCaller() {
   if (!calledRun) run();
@@ -279,6 +273,7 @@ function run(args) {
   if (runDependencies > 0) {
     return;
   }
+  preRun();
   if (runDependencies > 0) {
     return;
   }
@@ -288,9 +283,27 @@ function run(args) {
     Module['calledRun'] = true;
     if (ABORT) return;
     initRuntime();
-    Module['onRuntimeInitialized']();
+    if (Module['onRuntimeInitialized']) Module['onRuntimeInitialized']();
+    postRun();
   }
-  doRun();
+  if (Module['setStatus']) {
+    Module['setStatus']('Running...');
+    setTimeout(function () {
+      setTimeout(function () {
+        Module['setStatus']('');
+      }, 1);
+      doRun();
+    }, 1);
+  } else {
+    doRun();
+  }
+}
+Module['run'] = run;
+if (Module['preInit']) {
+  if (typeof Module['preInit'] == 'function') Module['preInit'] = [Module['preInit']];
+  while (Module['preInit'].length > 0) {
+    Module['preInit'].pop()();
+  }
 }
 Module['init'] = init;
 export default Module;
