@@ -4,9 +4,9 @@
   "repository": "ssh://git@github.com/bokuweb/zstd-wasm.git",
   "author": "<bokuweb12@gmail.com>",
   "license": "MIT",
-  "main": "dist/common/lib/index.node.js",
-  "browser": "dist/web/lib/index.web.js",
-  "types": "dist/web/lib/index.web.d.ts",
+  "main": "dist/common/index.node.js",
+  "browser": "dist/web/index.web.js",
+  "types": "dist/web/index.web.d.ts",
   "scripts": {
     "largefile": "yes \"Hello\" | head -n 40000000 > ./test/large-file",
     "tsc": "tsc -p tsconfig.json --skipLibCheck",
@@ -61,9 +61,9 @@
   },
   "dependencies": {},
   "exports": {
-    "node": "./dist/common/lib/index.node.js",
-    "require": "./dist/common/lib/index.node.js",
-    "browser": "./dist/web/lib/index.web.js",
-    "default": "./dist/common/lib/index.node.js"
+    "node": "./dist/common/index.node.js",
+    "require": "./dist/common/index.node.js",
+    "browser": "./dist/web/index.web.js",
+    "default": "./dist/common/index.node.js"
   }
 }
