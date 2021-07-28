@@ -22,8 +22,5 @@ module.exports = {
     extensions: ['.ts', '.js', '.wasm'],
   },
   plugins: [new HtmlWebpackPlugin()],
-  mode: 'development',
-  node: {
-    fs: 'empty',
-  },
+  mode: 'development'
 };

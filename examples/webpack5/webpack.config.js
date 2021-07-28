@@ -28,10 +28,6 @@ module.exports = [
     },
     resolve: {
       extensions: ['.ts', '.js', '.wasm'],
-      fallback: {
-        fs: false,
-        path: false,
-      },
     },
     plugins: [
       new HtmlWebpackPlugin(),
