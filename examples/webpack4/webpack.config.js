@@ -1,10 +1,9 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack');
 
 module.exports = {
   entry: {
-    index: [path.resolve(__dirname, 'examples/index.ts')],
+    index: [path.resolve(__dirname, 'index.ts')],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -29,13 +28,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js', '.wasm'],
   },
-  plugins: [
-    new HtmlWebpackPlugin(),
-    new webpack.ProvidePlugin({
-      TextDecoder: ['text-encoding', 'TextDecoder'],
-      TextEncoder: ['text-encoding', 'TextEncoder'],
-    }),
-  ],
+  plugins: [new HtmlWebpackPlugin()],
   mode: 'development',
   node: {
     fs: 'empty',
