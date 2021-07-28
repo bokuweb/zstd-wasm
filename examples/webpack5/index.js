@@ -1,4 +1,4 @@
-import { init, compress, decompress } from '../lib/index.web';
+import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 
 const hello = 'KLUv/SQMYQAASGVsbG8genN0ZCEhN2g+CQ==';
 
@@ -23,7 +23,9 @@ const hello = 'KLUv/SQMYQAASGVsbG8genN0ZCEhN2g+CQ==';
   await init();
   await decompressTest();
   await compressAndDecompressTest();
+
   document.body.innerText = 'Succeeded';
 })().catch((e) => {
+  console.error(e);
   document.body.innerText = 'Failed';
 });
