@@ -1,0 +1,9 @@
+{
+  "name": "node-common",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@bokuweb/zstd-wasm": "^0.0.14"
+  }
+}
