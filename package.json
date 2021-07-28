@@ -50,7 +50,7 @@
     "html-webpack-plugin": "3.2.0",
     "jest": "27.0.6",
     "prettier": "2.3.2",
-    "renamer": "^3.2.1",
+    "renamer": "3.2.1",
     "text-encoding": "0.7.0",
     "ts-jest": "27.0.4",
     "ts-loader": "8.3.0",
