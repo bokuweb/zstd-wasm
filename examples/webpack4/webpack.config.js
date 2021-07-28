@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: {
-    index: [path.resolve(__dirname, 'index.ts')],
+    index: [path.resolve(__dirname, 'index.js')],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -11,13 +11,6 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /\.ts$/,
-        loader: 'ts-loader',
-        options: {
-          transpileOnly: true,
-        },
-      },
       {
         test: /zstd\.wasm$/,
         type: 'javascript/auto',
