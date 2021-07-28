@@ -14,7 +14,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "sourceMap": true,
-    "outDir": "dist/node",
+    "outDir": "dist/common",
     "declaration": true,
     "forceConsistentCasingInFileNames": true
   },
