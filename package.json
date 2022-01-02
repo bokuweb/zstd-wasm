@@ -19,7 +19,7 @@
     "build:web": "npm run tsc:web && npm run copy:wasm:web",
     "build:common": "npm run tsc:common && npm run copy:wasm:common",
     "build:esm": "npm run tsc:esm && npm run copy:wasm:esm",
-    "build:deno": "node tools/deno.js",
+    "build:deno": "node tools/deno.js && sed -e 's/module.exports = /export default /' lib/wasm/zstd.js > deno/zstd.deno.js",
     "benchmark": "npx ts-node ./benchmark/index.ts",
     "build:js": "npm run clean && npm run build:web && npm run build:common && npm run build:esm && npm run build:deno",
     "clean": "rm -rf dist",
