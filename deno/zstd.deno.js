@@ -26,10 +26,13 @@ if (typeof WebAssembly !== 'object') {
 }
 var wasmMemory;
 var ABORT = false;
-function assert(condition, text) {
-  if (!condition) {
-    abort('Assertion failed: ' + text);
-  }
+function ___assert_fail(condition, filename, line, func) {
+  abort(
+    'Assertion failed: ' +
+      UTF8ToString(condition) +
+      ', at: ' +
+      [filename ? UTF8ToString(filename) : 'unknown filename', line, func ? UTF8ToString(func) : 'unknown function'],
+  );
 }
 function alignUp(x, multiple) {
   if (x % multiple > 0) {
@@ -135,10 +138,10 @@ function init(filePathOrBuf) {
   function receiveInstance(instance, module) {
     var exports = instance.exports;
     Module['asm'] = exports;
-    wasmMemory = Module['asm']['c'];
+    wasmMemory = Module['asm']['d'];
     updateGlobalBufferAndViews(wasmMemory.buffer);
-    wasmTable = Module['asm']['l'];
-    addOnInit(Module['asm']['d']);
+    wasmTable = Module['asm']['m'];
+    addOnInit(Module['asm']['e']);
     removeRunDependency('wasm-instantiate');
   }
   addRunDependency('wasm-instantiate');
@@ -237,31 +240,31 @@ function _emscripten_resize_heap(requestedSize) {
 function _setTempRet0(val) {
   setTempRet0(val);
 }
-var asmLibraryArg = { a: _emscripten_resize_heap, b: _setTempRet0 };
-Module['___wasm_call_ctors'] = function () {
-  return (Module['___wasm_call_ctors'] = Module['asm']['d']).apply(null, arguments);
-};
-Module['_malloc'] = function () {
-  return (Module['_malloc'] = Module['asm']['e']).apply(null, arguments);
-};
-Module['_free'] = function () {
-  return (Module['_free'] = Module['asm']['f']).apply(null, arguments);
-};
-Module['_ZSTD_isError'] = function () {
-  return (Module['_ZSTD_isError'] = Module['asm']['g']).apply(null, arguments);
-};
-Module['_ZSTD_compressBound'] = function () {
-  return (Module['_ZSTD_compressBound'] = Module['asm']['h']).apply(null, arguments);
-};
-Module['_ZSTD_compress'] = function () {
-  return (Module['_ZSTD_compress'] = Module['asm']['i']).apply(null, arguments);
-};
-Module['_ZSTD_getFrameContentSize'] = function () {
-  return (Module['_ZSTD_getFrameContentSize'] = Module['asm']['j']).apply(null, arguments);
-};
-Module['_ZSTD_decompress'] = function () {
-  return (Module['_ZSTD_decompress'] = Module['asm']['k']).apply(null, arguments);
-};
+var asmLibraryArg = { a: ___assert_fail, b: _emscripten_resize_heap, c: _setTempRet0 };
+(Module['___wasm_call_ctors'] = function () {
+  return (Module['___wasm_call_ctors'] = Module['asm']['e']).apply(null, arguments);
+});
+(Module['_malloc'] = function () {
+  return (Module['_malloc'] = Module['asm']['f']).apply(null, arguments);
+});
+(Module['_free'] = function () {
+  return (Module['_free'] = Module['asm']['g']).apply(null, arguments);
+});
+(Module['_ZSTD_isError'] = function () {
+  return (Module['_ZSTD_isError'] = Module['asm']['h']).apply(null, arguments);
+});
+(Module['_ZSTD_compressBound'] = function () {
+  return (Module['_ZSTD_compressBound'] = Module['asm']['i']).apply(null, arguments);
+});
+(Module['_ZSTD_compress'] = function () {
+  return (Module['_ZSTD_compress'] = Module['asm']['j']).apply(null, arguments);
+});
+(Module['_ZSTD_getFrameContentSize'] = function () {
+  return (Module['_ZSTD_getFrameContentSize'] = Module['asm']['k']).apply(null, arguments);
+});
+(Module['_ZSTD_decompress'] = function () {
+  return (Module['_ZSTD_decompress'] = Module['asm']['l']).apply(null, arguments);
+});
 
 var calledRun;
 dependenciesFulfilled = function runCaller() {
