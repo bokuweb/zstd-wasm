@@ -37,7 +37,7 @@
   "devDependencies": {
     "@types/benchmark": "2.1.1",
     "@types/jest": "27.4.0",
-    "@types/node": "16.11.18",
+    "@types/node": "16.11.19",
     "benchmark": "2.1.4",
     "glob-all": "3.2.1",
     "jest": "27.4.7",
