@@ -129,6 +129,28 @@ import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 }
 ```
 
+## Using dictionary
+
+1. Create the dictionary
+
+`zstd --train FullPathToTrainingSet/* -o dictionaryName`
+
+2. Compress with dictionary
+
+```typescript
+const dict = readFileSync('./dict');
+const compressed = compressUsingDict(createCCtx(), buffer, dict, 10);
+```
+
+3. Decompress with dictionary
+
+``` typescript
+const dict = readFileSync('./dict');
+const decompressed = compressUsingDict(createDCtx(), buffer, dict);
+```
+
+See also [example](./test/compress_using_dict.test.ts)
+
 ## API
 
 ### async init(path?: string): Promise<void>
@@ -156,6 +178,42 @@ const compressed = compress(buffer, 10);
 ```typescript
 const decompressed = decompress(buffer);
 ```
+
+### compressUsingDict(cctx: number, buffer: ArrayBuffer, dict: ArrayBuffer, compressionLevel?: number): ArrayBuffer
+
+- cctx: a pointer to compress context. please create cctx with `createCCtx`.
+- buffer: data to compress.
+- dict: dictionary data.
+- compressionLevel: (optional) compression level, default value is 3
+
+**Example:**
+
+```typescript
+const dict = readFileSync('./dict');
+const compressed = compressUsingDict(createCCtx(), buffer, dict, 10);
+```
+
+### createCCtx(): number
+
+- create a pointer to compress context.
+
+### decompressUsingDict(dctx: number, dict: ArrayBuffer): ArrayBuffer
+
+- dctx: a pointer to decompress context. please create cctx with `createDCtx`.
+- buffer: data to decompress.
+- dict: dictionary data.
+
+**Example:**
+
+```typescript
+const dict = readFileSync('./dict');
+const decompressed = compressUsingDict(createDCtx(), buffer, dict);
+```
+
+### createDCtx(): number
+
+- create a pointer to decompress context.
+
 
 ## License
 
