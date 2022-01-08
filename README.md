@@ -146,7 +146,7 @@ const compressed = compressUsingDict(createCCtx(), buffer, dict, 10);
 
 ``` typescript
 const dict = readFileSync('./dict');
-const decompressed = compressUsingDict(createDCtx(), buffer, dict);
+const decompressed = decompressUsingDict(createDCtx(), buffer, dict);
 ```
 
 See also [example](./test/compress_using_dict.test.ts)
@@ -207,7 +207,7 @@ const compressed = compressUsingDict(createCCtx(), buffer, dict, 10);
 
 ```typescript
 const dict = readFileSync('./dict');
-const decompressed = compressUsingDict(createDCtx(), buffer, dict);
+const decompressed = decompressUsingDict(createDCtx(), buffer, dict);
 ```
 
 ### createDCtx(): number
