@@ -1,13 +1,10 @@
 import { Module } from '../module';
 import { isError } from '../errors';
+import { DecompressOption } from './decompress';
 
 const getFrameContentSize = (src: number, size: number): number => {
   const getSize = Module['_ZSTD_getFrameContentSize'];
   return getSize(src, size);
-};
-
-export type DecompressOption = {
-  defaultHeapSize?: number;
 };
 
 export const createDCtx = (): number => {
