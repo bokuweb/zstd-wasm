@@ -36,11 +36,11 @@
   ],
   "devDependencies": {
     "@types/benchmark": "2.1.2",
-    "@types/jest": "28.1.4",
+    "@types/jest": "28.1.8",
     "@types/node": "16.11.45",
     "benchmark": "2.1.4",
     "glob-all": "3.3.0",
-    "jest": "28.1.2",
+    "jest": "28.1.3",
     "prettier": "2.7.1",
     "text-encoding": "0.7.0",
     "ts-jest": "28.0.7",
