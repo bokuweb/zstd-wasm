@@ -10,6 +10,10 @@ export const createCCtx = (): number => {
   return Module['_ZSTD_createCCtx']();
 };
 
+export const freeCCtx = (cctx: number) => {
+  return Module['_ZSTD_freeCCtx'](cctx);
+};
+
 export const compressUsingDict = (cctx: number, buf: ArrayBuffer, dict: ArrayBuffer, level?: number) => {
   const bound = compressBound(buf.byteLength);
   const malloc = Module['_malloc'];
