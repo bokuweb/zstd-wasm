@@ -11,6 +11,10 @@ export const createDCtx = (): number => {
   return Module['_ZSTD_createDCtx']();
 };
 
+export const freeDCtx = (dctx: number) => {
+  return Module['_ZSTD_freeDCtx'](dctx);
+};
+
 export const decompressUsingDict = (
   dctx: number,
   buf: ArrayBuffer,
@@ -37,10 +41,12 @@ export const decompressUsingDict = (
     const data = new Uint8Array(Module.HEAPU8.buffer, heap, sizeOrError).slice();
     free(heap, size);
     free(src, buf.byteLength);
+    free(pdict, dict.byteLength);
     return data;
   } catch (e) {
     free(heap, size);
     free(src, buf.byteLength);
+    free(pdict, dict.byteLength);
     throw e;
   }
 };
