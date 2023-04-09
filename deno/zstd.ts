@@ -143,6 +143,11 @@ export const compress = (buf: ArrayBuffer, level?: number) => {
 };
 
 
+const getFrameContentSize = (src: number, size: number): number => {
+  const getSize = Module["_ZSTD_getFrameContentSize"];
+  return getSize(src, size);
+};
+
 export const createDCtx = (): number => {
   return Module["_ZSTD_createDCtx"]();
 };
@@ -199,11 +204,6 @@ export const decompressUsingDict = (
   }
 };
 
-
-const getFrameContentSize = (src: number, size: number): number => {
-  const getSize = Module["_ZSTD_getFrameContentSize"];
-  return getSize(src, size);
-};
 
 export type DecompressOption = {
   defaultHeapSize?: number;

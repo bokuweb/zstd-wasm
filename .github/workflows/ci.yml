@@ -3,31 +3,31 @@ on: [push, pull_request]
 
 jobs:
   tsc:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: 14
+          node-version: 18
       - name: yarn
         run: yarn --frozen-lockfile
       - name: tsc
         run: yarn tsc
 
   test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: 14
+          node-version: 18
       - name: yarn
         run: yarn --frozen-lockfile
       - name: test
         run: yarn test
 
   deno:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@master
       - uses: denoland/setup-deno@v1
