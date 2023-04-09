@@ -98,6 +98,11 @@ export const compressUsingDict = (
 };
 
 
+const compressBound = (size: number): number => {
+  const bound = Module["_ZSTD_compressBound"];
+  return bound(size);
+};
+
 export const compress = (buf: ArrayBuffer, level?: number) => {
   const bound = compressBound(buf.byteLength);
   const malloc = Module["_malloc"];
@@ -142,6 +147,11 @@ export const compress = (buf: ArrayBuffer, level?: number) => {
   }
 };
 
+
+const getFrameContentSize = (src: number, size: number): number => {
+  const getSize = Module["_ZSTD_getFrameContentSize"];
+  return getSize(src, size);
+};
 
 export const createDCtx = (): number => {
   return Module["_ZSTD_createDCtx"]();
