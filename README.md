@@ -1,6 +1,7 @@
 # zstd-wasm
 
-<img src="https://github.com/bokuweb/zstd-wasm/workflows/Continuous%20Integration/badge.svg" alt="Build Status" />
+<img src="https://github.com/bokuweb/zstd-wasm/workflows/Continuous%20Integration/badge.svg" alt="Build Status" /> <a href="https://www.npmjs.com/package/@bokuweb/zstd-wasm"><img src="https://img.shields.io/npm/v/@bokuweb/zstd-wasm.svg" alt="Build Status" /></a>
+<a href="https://www.npmjs.com/package/@bokuweb/zstd-wasm"><img src="https://img.shields.io/npm/dm/@bokuweb/zstd-wasm.svg" /></a>
 
 Zstandard for browser, Node.js and Deno.
 For now support only simple API.
