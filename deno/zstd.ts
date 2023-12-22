@@ -1,5 +1,5 @@
 
-import { decode } from "https://deno.land/std/encoding/base64.ts"
+import { decodeBase64 } from "https://deno.land/std/encoding/base64.ts"
 import { wasm } from "./zstd.encoded.wasm.ts"
 import Module from './zstd.deno.js';
 
@@ -9,7 +9,7 @@ const initialized = (() =>
   }))();
 
 export const init = async () => {
-  const bytes = decode(wasm);
+  const bytes = decodeBase64(wasm);
   Module['init'](bytes);
   await initialized;
 };
