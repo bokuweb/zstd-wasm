@@ -35,7 +35,7 @@
     "dist"
   ],
   "devDependencies": {
-    "@types/benchmark": "2.1.2",
+    "@types/benchmark": "2.1.5",
     "@types/jest": "28.1.8",
     "@types/node": "20.12.4",
     "benchmark": "2.1.4",
