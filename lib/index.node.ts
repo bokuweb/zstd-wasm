@@ -1,9 +1,9 @@
 import { Module, waitInitialized } from './module';
 
 export const init = async () => {
-  const { readFileSync } = require('fs');
+  const { readFile } = require('fs/promises');
   const { resolve } = require('path');
-  const buf = readFileSync(resolve(__dirname, './wasm/zstd.wasm'));
+  const buf = await readFile(resolve(__dirname, './wasm/zstd.wasm'));
   Module['init'](buf);
   await waitInitialized();
 };
