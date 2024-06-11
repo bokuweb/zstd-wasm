@@ -4,7 +4,7 @@ set -eu
 
 rm -rf ./zstd
 
-git clone https://github.com/facebook/zstd.git zstd
+git clone --depth 500 https://github.com/facebook/zstd.git zstd
 
 cd zstd
 
@@ -24,7 +24,7 @@ cp zstd.c ../../../zstd.c
 
 cd ../../../
 
-docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk:3.1.0 emcc zstd.c -flto -o ./zstd.js -Oz --memory-init-file 0 --post-js export_module.js -s EXPORTED_FUNCTIONS="['_ZSTD_isError', '_ZSTD_getFrameContentSize', '_ZSTD_decompress', '_ZSTD_compress', '_ZSTD_compress_usingDict', '_ZSTD_decompress_usingDict', '_ZSTD_compressBound', '_malloc', '_free', '_ZSTD_createCCtx', '_ZSTD_createDCtx', '_ZSTD_freeCCtx', '_ZSTD_freeDCtx']" -s FILESYSTEM=0 -s ALLOW_MEMORY_GROWTH=1
+docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk:3.1.0 emcc -msse -msimd128 zstd.c -flto -o ./zstd.js -Oz --memory-init-file 0 --post-js export_module.js -s EXPORTED_FUNCTIONS="['_ZSTD_isError', '_ZSTD_getFrameContentSize', '_ZSTD_decompress', '_ZSTD_compress', '_ZSTD_compress_usingDict', '_ZSTD_decompress_usingDict', '_ZSTD_compressBound', '_malloc', '_free', '_ZSTD_createCCtx', '_ZSTD_createDCtx', '_ZSTD_freeCCtx', '_ZSTD_freeDCtx']" -s FILESYSTEM=0 -s ALLOW_MEMORY_GROWTH=1
 
 cp zstd.wasm lib/wasm/zstd.wasm
 
