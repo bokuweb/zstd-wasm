@@ -3,7 +3,7 @@ import { Module, waitInitialized } from './module';
 export const init = async () => {
   const { readFile } = require('fs/promises');
   const { resolve } = require('path');
-  const buf = await readFile(resolve(__dirname, './wasm/zstd.wasm'));
+  const buf = await readFile(resolve(__dirname, './zstd.wasm'));
   Module['init'](buf);
   await waitInitialized();
 };

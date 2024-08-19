@@ -18,5 +18,5 @@
     "declaration": true,
     "forceConsistentCasingInFileNames": true
   },
-  "exclude": ["examples", "benchmark", "test", "deno"]
+  "exclude": ["examples", "benchmark", "test", "deno", "lib/index.web.ts"]
 }
