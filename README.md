@@ -62,7 +62,7 @@ import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 
 Please set following config in `vite.config.js`.
 
-```
+``` js
 import { defineConfig } from 'vite';
 
 export default defineConfig({
