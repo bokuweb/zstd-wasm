@@ -1,4 +1,4 @@
-const Module = require('./wasm/zstd.js');
+import { Module } from './zstd';
 
 const initialized = (() =>
   new Promise<void>((resolve) => {

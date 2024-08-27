@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@bokuweb/zstd-wasm@^0.0.19":
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/@bokuweb/zstd-wasm/-/zstd-wasm-0.0.19.tgz#51b267db13f98850eca1d277eb32330a1e0044df"
-  integrity sha512-Y17cCvp1Fc70j3h3NP0QPlOblWwBwWQyDDAdQjxgJgc4/H7z4CsFLc9SRfdPX7owiMVJGlmEnPmV9tMLM8jsKw==
+"@bokuweb/zstd-wasm@0.0.21-alpha.5":
+  version "0.0.21-alpha.5"
+  resolved "https://registry.yarnpkg.com/@bokuweb/zstd-wasm/-/zstd-wasm-0.0.21-alpha.5.tgz#e8f8732b639f727fec48fa6516e575aff685cd73"
+  integrity sha512-HydRNavt4rlQH3sbAG1iksR9V9+AsxfAXSzG5zRoksFn0f+yq8VqJ/BFp5MdcGt6lzNdELDiCOjKvJ3NpSc+Qw==

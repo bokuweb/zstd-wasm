@@ -1,3 +1,4 @@
+// @ts-nocheck
 var Module = typeof Module !== 'undefined' ? Module : {};
 var moduleOverrides = {};
 var key;
@@ -113,7 +114,6 @@ function abort(what) {
   what += '';
   err(what);
   ABORT = true;
-  EXITSTATUS = 1;
   what = 'abort(' + what + ').';
   var e = new WebAssembly.RuntimeError(what);
   throw e;
@@ -322,4 +322,5 @@ if (Module['preInit']) {
   }
 }
 Module['init'] = init;
-module.exports = Module;
+
+export { Module };

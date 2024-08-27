@@ -121,5 +121,6 @@ dist
 zstd
 zstd.js
 zstd.wasm
+!lib/zstd.wasm
 zstd.c
 .DS_Store

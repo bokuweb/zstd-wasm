@@ -9,15 +9,16 @@
   },
   "devDependencies": {
     "@types/node": "16.4.4",
+    "buffer": "^6.0.3",
     "file-loader": "6.2.0",
     "html-webpack-plugin": "5.3.2",
     "text-encoding": "0.7.0",
-    "buffer": "^6.0.3",
+    "ts-loader": "^9.5.1",
     "webpack": "5.47.0",
     "webpack-cli": "4.7.2",
     "webpack-dev-server": "3.11.2"
   },
   "dependencies": {
-    "@bokuweb/zstd-wasm": "^0.0.14"
+    "@bokuweb/zstd-wasm": "0.0.21-alpha.5"
   }
 }

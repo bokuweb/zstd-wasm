@@ -5,6 +5,6 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
-    "@bokuweb/zstd-wasm": "^0.0.19"
+    "@bokuweb/zstd-wasm": "0.0.21-alpha.5"
   }
 }
