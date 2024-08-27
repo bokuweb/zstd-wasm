@@ -58,6 +58,25 @@ import { init, compress, decompress } from '@bokuweb/zstd-wasm';
 
 ---
 
+### with `vite`
+
+Please set following config in `vite.config.js`.
+
+```
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  optimizeDeps: {
+    exclude: ['@bokuweb/zstd-wasm'],
+    esbuildOptions: {
+      target: 'es2020',
+    },
+  },
+});
+```
+
+---
+
 ### with webpack4
 
 We need to use `file-loader` with webpack4.
