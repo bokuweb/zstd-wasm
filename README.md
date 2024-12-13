@@ -178,7 +178,7 @@ See also [example](./test/compress_using_dict.test.ts)
 Initialize module.
 Please specify path to `zstd.wasm` without bunders on browser.
 
-### compress(buffer: ArrayBuffer, compressionLevel?: number): ArrayBuffer
+### compress(buffer: Uint8Array, compressionLevel?: number): Uint8Array
 
 - buffer: data to compress.
 - compressionLevel: (optional) compression level, default value is 3
@@ -189,7 +189,7 @@ Please specify path to `zstd.wasm` without bunders on browser.
 const compressed = compress(buffer, 10);
 ```
 
-### decompress(buffer: ArrayBuffer): ArrayBuffer
+### decompress(buffer: Uint8Array): Uint8Array
 
 - buffer: data to decompress.
 
@@ -199,7 +199,7 @@ const compressed = compress(buffer, 10);
 const decompressed = decompress(buffer);
 ```
 
-### compressUsingDict(cctx: number, buffer: ArrayBuffer, dict: ArrayBuffer, compressionLevel?: number): ArrayBuffer
+### compressUsingDict(cctx: number, buffer: Uint8Array, dict: Uint8Array, compressionLevel?: number): Uint8Array
 
 - cctx: a pointer to compress context. please create cctx with `createCCtx`.
 - buffer: data to compress.
@@ -217,7 +217,7 @@ const compressed = compressUsingDict(createCCtx(), buffer, dict, 10);
 
 - create a pointer to compress context.
 
-### decompressUsingDict(dctx: number, dict: ArrayBuffer): ArrayBuffer
+### decompressUsingDict(dctx: number, dict: Uint8Array): Uint8Array
 
 - dctx: a pointer to decompress context. please create cctx with `createDCtx`.
 - buffer: data to decompress.

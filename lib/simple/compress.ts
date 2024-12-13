@@ -6,7 +6,7 @@ const compressBound = (size: number): number => {
   return bound(size);
 };
 
-export const compress = (buf: ArrayBuffer, level?: number) => {
+export const compress = (buf: Uint8Array, level?: number): Uint8Array => {
   const bound = compressBound(buf.byteLength);
   const malloc = Module['_malloc'];
   const compressed = malloc(bound);

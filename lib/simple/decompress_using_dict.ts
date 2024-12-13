@@ -17,10 +17,10 @@ export const freeDCtx = (dctx: number) => {
 
 export const decompressUsingDict = (
   dctx: number,
-  buf: ArrayBuffer,
-  dict: ArrayBuffer,
+  buf: Uint8Array,
+  dict: Uint8Array,
   opts: DecompressOption = { defaultHeapSize: 1024 * 1024 }, // Use 1MB on default if it is failed to get content size.
-): ArrayBuffer => {
+): Uint8Array => {
   const malloc = Module['_malloc'];
   const src = malloc(buf.byteLength);
   Module.HEAP8.set(buf, src);
