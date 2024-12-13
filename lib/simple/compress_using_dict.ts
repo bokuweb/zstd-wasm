@@ -14,7 +14,7 @@ export const freeCCtx = (cctx: number) => {
   return Module['_ZSTD_freeCCtx'](cctx);
 };
 
-export const compressUsingDict = (cctx: number, buf: ArrayBuffer, dict: ArrayBuffer, level?: number) => {
+export const compressUsingDict = (cctx: number, buf: Uint8Array, dict: Uint8Array, level?: number): Uint8Array => {
   const bound = compressBound(buf.byteLength);
   const malloc = Module['_malloc'];
   const compressed = malloc(bound);
