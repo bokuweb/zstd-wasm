@@ -14,6 +14,11 @@ for (key in moduleOverrides) {
     Module[key] = moduleOverrides[key];
   }
 }
+
+var quit_ = (status, toThrow) => {
+  throw toThrow;
+};
+
 moduleOverrides = null;
 if (Module['arguments']) arguments_ = Module['arguments'];
 if (Module['thisProgram']) thisProgram = Module['thisProgram'];
@@ -27,14 +32,8 @@ if (typeof WebAssembly !== 'object') {
 }
 var wasmMemory;
 var ABORT = false;
+var EXITSTATUS;
 var buffer, HEAPU8, HEAP8;
-function updateGlobalBufferAndViews(buf) {
-  buffer = buf;
-  Module['HEAP8'] = new Int8Array(buf);
-  Module['HEAPU8'] = HEAPU8 = new Uint8Array(buf);
-}
-var INITIAL_MEMORY = Module['INITIAL_MEMORY'] || 16777216;
-var wasmTable;
 
 function updateMemoryViews() {
   var b = wasmMemory.buffer;
@@ -46,85 +45,6 @@ var __ATPRERUN__ = [];
 var __ATINIT__ = [];
 var __ATPOSTRUN__ = [];
 var runtimeInitialized = false;
-function preRun() {
-  if (Module['preRun']) {
-    if (typeof Module['preRun'] == 'function') Module['preRun'] = [Module['preRun']];
-    while (Module['preRun'].length) {
-      addOnPreRun(Module['preRun'].shift());
-    }
-  }
-  callRuntimeCallbacks(__ATPRERUN__);
-}
-function initRuntime() {
-  runtimeInitialized = true;
-  callRuntimeCallbacks(__ATINIT__);
-}
-function postRun() {
-  if (Module['postRun']) {
-    if (typeof Module['postRun'] == 'function') Module['postRun'] = [Module['postRun']];
-    while (Module['postRun'].length) {
-      addOnPostRun(Module['postRun'].shift());
-    }
-  }
-  callRuntimeCallbacks(__ATPOSTRUN__);
-}
-function addOnPreRun(cb) {
-  __ATPRERUN__.unshift(cb);
-}
-function addOnInit(cb) {
-  __ATINIT__.unshift(cb);
-}
-function addOnPostRun(cb) {
-  __ATPOSTRUN__.unshift(cb);
-}
-var runDependencies = 0;
-var runDependencyWatcher = null;
-var dependenciesFulfilled = null;
-function addRunDependency(id) {
-  runDependencies++;
-  if (Module['monitorRunDependencies']) {
-    Module['monitorRunDependencies'](runDependencies);
-  }
-}
-function removeRunDependency(id) {
-  runDependencies--;
-  if (Module['monitorRunDependencies']) {
-    Module['monitorRunDependencies'](runDependencies);
-  }
-  if (runDependencies == 0) {
-    if (runDependencyWatcher !== null) {
-      clearInterval(runDependencyWatcher);
-      runDependencyWatcher = null;
-    }
-    if (dependenciesFulfilled) {
-      var callback = dependenciesFulfilled;
-      dependenciesFulfilled = null;
-      callback();
-    }
-  }
-}
-Module['preloadedImages'] = {};
-Module['preloadedAudios'] = {};
-function abort(what) {
-  if (Module['onAbort']) {
-    Module['onAbort'](what);
-  }
-  what += '';
-  err(what);
-  ABORT = true;
-  what = 'abort(' + what + ').';
-  var e = new WebAssembly.RuntimeError(what);
-  throw e;
-}
-
-function getBinaryPromise(url) {
-  return fetch(url, { credentials: 'same-origin' }).then(function (response) {
-    if (!response['ok']) {
-      throw "failed to load wasm binary file at '" + url + "'";
-    }
-    return response['arrayBuffer']();
-  });
-}
 
 function preRun() {
   if (Module['preRun']) {
@@ -188,6 +108,15 @@ function getWasmImports() {
   return { a: wasmImports };
 }
 
+function getBinaryPromise(url) {
+  return fetch(url, { credentials: 'same-origin' }).then(function (response) {
+    if (!response['ok']) {
+      throw "failed to load wasm binary file at '" + url + "'";
+    }
+    return response['arrayBuffer']();
+  });
+}
+
 function init(filePathOrBuf) {
   var info = getWasmImports();
   function receiveInstance(instance, module) {
@@ -247,32 +176,6 @@ function init(filePathOrBuf) {
   instantiateAsync();
   return {};
 }
-function callRuntimeCallbacks(callbacks) {
-  while (callbacks.length > 0) {
-    var callback = callbacks.shift();
-    if (typeof callback == 'function') {
-      callback(Module);
-      continue;
-    }
-    var func = callback.func;
-    if (typeof func === 'number') {
-      if (callback.arg === undefined) {
-        wasmTable.get(func)();
-      } else {
-        wasmTable.get(func)(callback.arg);
-      }
-    } else {
-      func(callback.arg === undefined ? null : callback.arg);
-    }
-  }
-}
-function emscripten_realloc_buffer(size) {
-  try {
-    wasmMemory.grow((size - buffer.byteLength + 65535) >>> 16);
-    updateGlobalBufferAndViews(wasmMemory.buffer);
-    return 1;
-  } catch (e) {}
-}
 
 class ExitStatus {
   name = 'ExitStatus';
@@ -313,6 +216,7 @@ var exitJS = (status, implicit) => {
   EXITSTATUS = status;
   _proc_exit(status);
 };
+
 var _exit = exitJS;
 var maybeExit = () => {
   if (!keepRuntimeAlive()) {
@@ -321,17 +225,6 @@ var maybeExit = () => {
     } catch (e) {
       handleException(e);
     }
-  }
-};
-var callUserCallback = (func) => {
-  if (ABORT) {
-    return;
-  }
-  try {
-    func();
-    maybeExit();
-  } catch (e) {
-    handleException(e);
   }
 };
 
