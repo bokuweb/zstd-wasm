@@ -28,7 +28,7 @@ if (typeof WebAssembly !== 'object') {
 var wasmMemory;
 var ABORT = false;
 function ___assert_fail(condition, filename, line, func) {
-  abort('Assertion failed: ' + [filename ? filename : 'unknown filename', line, func ? func : 'unknown function']);
+  //  abort('Assertion failed: ' + [filename ? filename : 'unknown filename', line, func ? func : 'unknown function']);
 }
 function alignUp(x, multiple) {
   if (x % multiple > 0) {
@@ -133,10 +133,10 @@ function init(filePathOrBuf) {
   function receiveInstance(instance, module) {
     var exports = instance.exports;
     Module['asm'] = exports;
-    wasmMemory = Module['asm']['d'];
+    wasmMemory = Module['asm']['c'];
     updateGlobalBufferAndViews(wasmMemory.buffer);
-    wasmTable = Module['asm']['s'];
-    addOnInit(Module['asm']['e']);
+    wasmTable = Module['asm']['r'];
+    addOnInit(Module['asm']['d']);
     removeRunDependency('wasm-instantiate');
   }
   addRunDependency('wasm-instantiate');
@@ -235,48 +235,52 @@ function _emscripten_resize_heap(requestedSize) {
 function _setTempRet0(val) {
   setTempRet0(val);
 }
-var asmLibraryArg = { a: ___assert_fail, b: _emscripten_resize_heap, c: _setTempRet0 };
+
+var asmLibraryArg = { a: _emscripten_resize_heap, b: _setTempRet0 };
 Module['___wasm_call_ctors'] = function () {
-  return (Module['___wasm_call_ctors'] = Module['asm']['e']).apply(null, arguments);
-};
-Module['_malloc'] = function () {
-  return (Module['_malloc'] = Module['asm']['q']).apply(null, arguments);
-};
-Module['_free'] = function () {
-  return (Module['_free'] = Module['asm']['r']).apply(null, arguments);
+  return (___wasm_call_ctors = Module['___wasm_call_ctors'] = Module['asm']['d']).apply(null, arguments);
 };
 Module['_ZSTD_isError'] = function () {
-  return (Module['_ZSTD_isError'] = Module['asm']['f']).apply(null, arguments);
+  return (_ZSTD_isError = Module['_ZSTD_isError'] = Module['asm']['e']).apply(null, arguments);
 };
 Module['_ZSTD_compressBound'] = function () {
-  return (Module['_ZSTD_compressBound'] = Module['asm']['g']).apply(null, arguments);
+  return (_ZSTD_compressBound = Module['_ZSTD_compressBound'] = Module['asm']['f']).apply(null, arguments);
 };
 Module['_ZSTD_createCCtx'] = function () {
-  return (Module['_ZSTD_createCCtx'] = Module['asm']['h']).apply(null, arguments);
+  return (_ZSTD_createCCtx = Module['_ZSTD_createCCtx'] = Module['asm']['g']).apply(null, arguments);
 };
 Module['_ZSTD_freeCCtx'] = function () {
-  return (Module['_ZSTD_freeCCtx'] = Module['asm']['i']).apply(null, arguments);
+  return (_ZSTD_freeCCtx = Module['_ZSTD_freeCCtx'] = Module['asm']['h']).apply(null, arguments);
 };
 Module['_ZSTD_compress_usingDict'] = function () {
-  return (Module['_ZSTD_compress_usingDict'] = Module['asm']['j']).apply(null, arguments);
+  return (_ZSTD_compress_usingDict = Module['_ZSTD_compress_usingDict'] = Module['asm']['i']).apply(null, arguments);
 };
 Module['_ZSTD_compress'] = function () {
-  return (Module['_ZSTD_compress'] = Module['asm']['k']).apply(null, arguments);
+  return (_ZSTD_compress = Module['_ZSTD_compress'] = Module['asm']['j']).apply(null, arguments);
 };
 Module['_ZSTD_createDCtx'] = function () {
-  return (Module['_ZSTD_createDCtx'] = Module['asm']['l']).apply(null, arguments);
+  return (_ZSTD_createDCtx = Module['_ZSTD_createDCtx'] = Module['asm']['k']).apply(null, arguments);
 };
 Module['_ZSTD_freeDCtx'] = function () {
-  return (Module['_ZSTD_freeDCtx'] = Module['asm']['m']).apply(null, arguments);
+  return (_ZSTD_freeDCtx = Module['_ZSTD_freeDCtx'] = Module['asm']['l']).apply(null, arguments);
 };
 Module['_ZSTD_getFrameContentSize'] = function () {
-  return (Module['_ZSTD_getFrameContentSize'] = Module['asm']['n']).apply(null, arguments);
+  return (_ZSTD_getFrameContentSize = Module['_ZSTD_getFrameContentSize'] = Module['asm']['m']).apply(null, arguments);
 };
 Module['_ZSTD_decompress_usingDict'] = function () {
-  return (Module['_ZSTD_decompress_usingDict'] = Module['asm']['o']).apply(null, arguments);
+  return (_ZSTD_decompress_usingDict = Module['_ZSTD_decompress_usingDict'] = Module['asm']['n']).apply(
+    null,
+    arguments,
+  );
 };
 Module['_ZSTD_decompress'] = function () {
-  return (Module['_ZSTD_decompress'] = Module['asm']['p']).apply(null, arguments);
+  return (_ZSTD_decompress = Module['_ZSTD_decompress'] = Module['asm']['o']).apply(null, arguments);
+};
+Module['_malloc'] = function () {
+  return (_malloc = Module['_malloc'] = Module['asm']['p']).apply(null, arguments);
+};
+Module['_free'] = function () {
+  return (_free = Module['_free'] = Module['asm']['q']).apply(null, arguments);
 };
 
 var calledRun;
