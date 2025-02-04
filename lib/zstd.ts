@@ -27,16 +27,7 @@ if (typeof WebAssembly !== 'object') {
 }
 var wasmMemory;
 var ABORT = false;
-function ___assert_fail(condition, filename, line, func) {
-  //  abort('Assertion failed: ' + [filename ? filename : 'unknown filename', line, func ? func : 'unknown function']);
-}
-function alignUp(x, multiple) {
-  if (x % multiple > 0) {
-    x += multiple - (x % multiple);
-  }
-  return x;
-}
-var buffer, HEAPU8;
+var buffer, HEAPU8, HEAP8;
 function updateGlobalBufferAndViews(buf) {
   buffer = buf;
   Module['HEAP8'] = new Int8Array(buf);
@@ -44,6 +35,13 @@ function updateGlobalBufferAndViews(buf) {
 }
 var INITIAL_MEMORY = Module['INITIAL_MEMORY'] || 16777216;
 var wasmTable;
+
+function updateMemoryViews() {
+  var b = wasmMemory.buffer;
+  Module['HEAP8'] = HEAP8 = new Int8Array(b);
+  Module['HEAPU8'] = HEAPU8 = new Uint8Array(b);
+}
+
 var __ATPRERUN__ = [];
 var __ATINIT__ = [];
 var __ATPOSTRUN__ = [];
@@ -128,16 +126,77 @@ function getBinaryPromise(url) {
   });
 }
 
+function preRun() {
+  if (Module['preRun']) {
+    if (typeof Module['preRun'] == 'function') Module['preRun'] = [Module['preRun']];
+    while (Module['preRun'].length) {
+      addOnPreRun(Module['preRun'].shift());
+    }
+  }
+  callRuntimeCallbacks(__ATPRERUN__);
+}
+function initRuntime() {
+  runtimeInitialized = true;
+  callRuntimeCallbacks(__ATINIT__);
+}
+function postRun() {
+  if (Module['postRun']) {
+    if (typeof Module['postRun'] == 'function') Module['postRun'] = [Module['postRun']];
+    while (Module['postRun'].length) {
+      addOnPostRun(Module['postRun'].shift());
+    }
+  }
+  callRuntimeCallbacks(__ATPOSTRUN__);
+}
+function addOnPreRun(cb) {
+  __ATPRERUN__.unshift(cb);
+}
+function addOnInit(cb) {
+  __ATINIT__.unshift(cb);
+}
+function addOnPostRun(cb) {
+  __ATPOSTRUN__.unshift(cb);
+}
+var runDependencies = 0;
+var dependenciesFulfilled = null;
+function addRunDependency(id) {
+  runDependencies++;
+  Module['monitorRunDependencies']?.(runDependencies);
+}
+function removeRunDependency(id) {
+  runDependencies--;
+  Module['monitorRunDependencies']?.(runDependencies);
+  if (runDependencies == 0) {
+    if (dependenciesFulfilled) {
+      var callback = dependenciesFulfilled;
+      dependenciesFulfilled = null;
+      callback();
+    }
+  }
+}
+function abort(what) {
+  Module['onAbort']?.(what);
+  what = 'Aborted(' + what + ')';
+  err(what);
+  ABORT = true;
+  what += '. Build with -sASSERTIONS for more info.';
+  var e = new WebAssembly.RuntimeError(what);
+  throw e;
+}
+
+function getWasmImports() {
+  return { a: wasmImports };
+}
+
 function init(filePathOrBuf) {
-  var info = { a: asmLibraryArg };
+  var info = getWasmImports();
   function receiveInstance(instance, module) {
-    var exports = instance.exports;
-    Module['asm'] = exports;
-    wasmMemory = Module['asm']['c'];
-    updateGlobalBufferAndViews(wasmMemory.buffer);
-    wasmTable = Module['asm']['r'];
-    addOnInit(Module['asm']['d']);
+    wasmExports = instance.exports;
+    wasmMemory = wasmExports['f'];
+    updateMemoryViews();
+    addOnInit(wasmExports['g']);
     removeRunDependency('wasm-instantiate');
+    return wasmExports;
   }
   addRunDependency('wasm-instantiate');
   function receiveInstantiationResult(result) {
@@ -214,79 +273,166 @@ function emscripten_realloc_buffer(size) {
     return 1;
   } catch (e) {}
 }
-function _emscripten_resize_heap(requestedSize) {
+
+class ExitStatus {
+  name = 'ExitStatus';
+  constructor(status) {
+    this.message = `Program terminated with exit(${status})`;
+    this.status = status;
+  }
+}
+var callRuntimeCallbacks = (callbacks) => {
+  while (callbacks.length > 0) {
+    callbacks.shift()(Module);
+  }
+};
+var noExitRuntime = Module['noExitRuntime'] || true;
+var __abort_js = () => abort('');
+var runtimeKeepaliveCounter = 0;
+var __emscripten_runtime_keepalive_clear = () => {
+  noExitRuntime = false;
+  runtimeKeepaliveCounter = 0;
+};
+var timers = {};
+var handleException = (e) => {
+  if (e instanceof ExitStatus || e == 'unwind') {
+    return EXITSTATUS;
+  }
+  quit_(1, e);
+};
+var keepRuntimeAlive = () => noExitRuntime || runtimeKeepaliveCounter > 0;
+var _proc_exit = (code) => {
+  EXITSTATUS = code;
+  if (!keepRuntimeAlive()) {
+    Module['onExit']?.(code);
+    ABORT = true;
+  }
+  quit_(code, new ExitStatus(code));
+};
+var exitJS = (status, implicit) => {
+  EXITSTATUS = status;
+  _proc_exit(status);
+};
+var _exit = exitJS;
+var maybeExit = () => {
+  if (!keepRuntimeAlive()) {
+    try {
+      _exit(EXITSTATUS);
+    } catch (e) {
+      handleException(e);
+    }
+  }
+};
+var callUserCallback = (func) => {
+  if (ABORT) {
+    return;
+  }
+  try {
+    func();
+    maybeExit();
+  } catch (e) {
+    handleException(e);
+  }
+};
+
+var callUserCallback = (func) => {
+  if (ABORT) {
+    return;
+  }
+  try {
+    func();
+    maybeExit();
+  } catch (e) {
+    handleException(e);
+  }
+};
+var _emscripten_get_now = () => performance.now();
+var __setitimer_js = (which, timeout_ms) => {
+  if (timers[which]) {
+    clearTimeout(timers[which].id);
+    delete timers[which];
+  }
+  if (!timeout_ms) return 0;
+  var id = setTimeout(() => {
+    delete timers[which];
+    callUserCallback(() => __emscripten_timeout(which, _emscripten_get_now()));
+  }, timeout_ms);
+  timers[which] = { id, timeout_ms };
+  return 0;
+};
+
+var getHeapMax = () => 2147483648;
+var alignMemory = (size, alignment) => Math.ceil(size / alignment) * alignment;
+var growMemory = (size) => {
+  var b = wasmMemory.buffer;
+  var pages = ((size - b.byteLength + 65535) / 65536) | 0;
+  try {
+    wasmMemory.grow(pages);
+    updateMemoryViews();
+    return 1;
+  } catch (e) {}
+};
+var _emscripten_resize_heap = (requestedSize) => {
   var oldSize = HEAPU8.length;
-  requestedSize = requestedSize >>> 0;
-  var maxHeapSize = 2147483648;
+  requestedSize >>>= 0;
+  var maxHeapSize = getHeapMax();
   if (requestedSize > maxHeapSize) {
     return false;
   }
   for (var cutDown = 1; cutDown <= 4; cutDown *= 2) {
     var overGrownHeapSize = oldSize * (1 + 0.2 / cutDown);
     overGrownHeapSize = Math.min(overGrownHeapSize, requestedSize + 100663296);
-    var newSize = Math.min(maxHeapSize, alignUp(Math.max(requestedSize, overGrownHeapSize), 65536));
-    var replacement = emscripten_realloc_buffer(newSize);
+    var newSize = Math.min(maxHeapSize, alignMemory(Math.max(requestedSize, overGrownHeapSize), 65536));
+    var replacement = growMemory(newSize);
     if (replacement) {
       return true;
     }
   }
   return false;
-}
-function _setTempRet0(val) {
-  setTempRet0(val);
-}
+};
 
-var asmLibraryArg = { a: _emscripten_resize_heap, b: _setTempRet0 };
-Module['___wasm_call_ctors'] = function () {
-  return (Module['___wasm_call_ctors'] = Module['asm']['d']).apply(null, arguments);
+var wasmImports = {
+  c: __abort_js,
+  b: __emscripten_runtime_keepalive_clear,
+  d: __setitimer_js,
+  e: _emscripten_resize_heap,
+  a: _proc_exit,
 };
-Module['_ZSTD_isError'] = function () {
-  return (Module['_ZSTD_isError'] = Module['asm']['e']).apply(null, arguments);
-};
-Module['_ZSTD_compressBound'] = function () {
-  return (Module['_ZSTD_compressBound'] = Module['asm']['f']).apply(null, arguments);
-};
-Module['_ZSTD_createCCtx'] = function () {
-  return (Module['_ZSTD_createCCtx'] = Module['asm']['g']).apply(null, arguments);
-};
-Module['_ZSTD_freeCCtx'] = function () {
-  return (Module['_ZSTD_freeCCtx'] = Module['asm']['h']).apply(null, arguments);
-};
-Module['_ZSTD_compress_usingDict'] = function () {
-  return (Module['_ZSTD_compress_usingDict'] = Module['asm']['i']).apply(null, arguments);
-};
-Module['_ZSTD_compress'] = function () {
-  return (Module['_ZSTD_compress'] = Module['asm']['j']).apply(null, arguments);
-};
-Module['_ZSTD_createDCtx'] = function () {
-  return (Module['_ZSTD_createDCtx'] = Module['asm']['k']).apply(null, arguments);
-};
-Module['_ZSTD_freeDCtx'] = function () {
-  return (Module['_ZSTD_freeDCtx'] = Module['asm']['l']).apply(null, arguments);
-};
-Module['_ZSTD_getFrameContentSize'] = function () {
-  return (Module['_ZSTD_getFrameContentSize'] = Module['asm']['m']).apply(null, arguments);
-};
-Module['_ZSTD_decompress_usingDict'] = function () {
-  return (Module['_ZSTD_decompress_usingDict'] = Module['asm']['n']).apply(null, arguments);
-};
-Module['_ZSTD_decompress'] = function () {
-  return (Module['_ZSTD_decompress'] = Module['asm']['o']).apply(null, arguments);
-};
-Module['_malloc'] = function () {
-  return (Module['_malloc'] = Module['asm']['p']).apply(null, arguments);
-};
-Module['_free'] = function () {
-  return (Module['_free'] = Module['asm']['q']).apply(null, arguments);
-};
+var wasmExports;
+
+var ___wasm_call_ctors = () => (___wasm_call_ctors = wasmExports['g'])();
+var _ZSTD_isError = (Module['_ZSTD_isError'] = (a0) =>
+  (_ZSTD_isError = Module['_ZSTD_isError'] = wasmExports['h'])(a0));
+var _ZSTD_compressBound = (Module['_ZSTD_compressBound'] = (a0) =>
+  (_ZSTD_compressBound = Module['_ZSTD_compressBound'] = wasmExports['i'])(a0));
+var _ZSTD_createCCtx = (Module['_ZSTD_createCCtx'] = () =>
+  (_ZSTD_createCCtx = Module['_ZSTD_createCCtx'] = wasmExports['j'])());
+var _ZSTD_freeCCtx = (Module['_ZSTD_freeCCtx'] = (a0) =>
+  (_ZSTD_freeCCtx = Module['_ZSTD_freeCCtx'] = wasmExports['k'])(a0));
+var _ZSTD_compress_usingDict = (Module['_ZSTD_compress_usingDict'] = (a0, a1, a2, a3, a4, a5, a6, a7) =>
+  (_ZSTD_compress_usingDict = Module['_ZSTD_compress_usingDict'] = wasmExports['l'])(a0, a1, a2, a3, a4, a5, a6, a7));
+var _ZSTD_compress = (Module['_ZSTD_compress'] = (a0, a1, a2, a3, a4) =>
+  (_ZSTD_compress = Module['_ZSTD_compress'] = wasmExports['m'])(a0, a1, a2, a3, a4));
+var _ZSTD_createDCtx = (Module['_ZSTD_createDCtx'] = () =>
+  (_ZSTD_createDCtx = Module['_ZSTD_createDCtx'] = wasmExports['n'])());
+var _ZSTD_freeDCtx = (Module['_ZSTD_freeDCtx'] = (a0) =>
+  (_ZSTD_freeDCtx = Module['_ZSTD_freeDCtx'] = wasmExports['o'])(a0));
+var _ZSTD_getFrameContentSize = (Module['_ZSTD_getFrameContentSize'] = (a0, a1) =>
+  (_ZSTD_getFrameContentSize = Module['_ZSTD_getFrameContentSize'] = wasmExports['p'])(a0, a1));
+var _ZSTD_decompress_usingDict = (Module['_ZSTD_decompress_usingDict'] = (a0, a1, a2, a3, a4, a5, a6) =>
+  (_ZSTD_decompress_usingDict = Module['_ZSTD_decompress_usingDict'] = wasmExports['q'])(a0, a1, a2, a3, a4, a5, a6));
+var _ZSTD_decompress = (Module['_ZSTD_decompress'] = (a0, a1, a2, a3) =>
+  (_ZSTD_decompress = Module['_ZSTD_decompress'] = wasmExports['r'])(a0, a1, a2, a3));
+var _malloc = (Module['_malloc'] = (a0) => (_malloc = Module['_malloc'] = wasmExports['s'])(a0));
+var _free = (Module['_free'] = (a0) => (_free = Module['_free'] = wasmExports['t'])(a0));
+var __emscripten_timeout = (a0, a1) => (__emscripten_timeout = wasmExports['v'])(a0, a1);
 
 var calledRun;
 dependenciesFulfilled = function runCaller() {
   if (!calledRun) run();
   if (!calledRun) dependenciesFulfilled = runCaller;
 };
-function run(args) {
-  args = args || arguments_;
+function run() {
   if (runDependencies > 0) {
     return;
   }
@@ -300,15 +446,13 @@ function run(args) {
     Module['calledRun'] = true;
     if (ABORT) return;
     initRuntime();
-    if (Module['onRuntimeInitialized']) Module['onRuntimeInitialized']();
+    Module['onRuntimeInitialized']?.();
     postRun();
   }
   if (Module['setStatus']) {
     Module['setStatus']('Running...');
-    setTimeout(function () {
-      setTimeout(function () {
-        Module['setStatus']('');
-      }, 1);
+    setTimeout(() => {
+      setTimeout(() => Module['setStatus'](''), 1);
       doRun();
     }, 1);
   } else {
