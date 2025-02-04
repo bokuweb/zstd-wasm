@@ -271,13 +271,13 @@ Module['_ZSTD_decompress_usingDict'] = function () {
   return (Module['_ZSTD_decompress_usingDict'] = Module['asm']['n']).apply(null, arguments);
 };
 Module['_ZSTD_decompress'] = function () {
-  return (_ZSTD_decompress = Module['_ZSTD_decompress'] = Module['asm']['o']).apply(null, arguments);
+  return (Module['_ZSTD_decompress'] = Module['asm']['o']).apply(null, arguments);
 };
 Module['_malloc'] = function () {
-  return (_malloc = Module['_malloc'] = Module['asm']['p']).apply(null, arguments);
+  return (Module['_malloc'] = Module['asm']['p']).apply(null, arguments);
 };
 Module['_free'] = function () {
-  return (_free = Module['_free'] = Module['asm']['q']).apply(null, arguments);
+  return (Module['_free'] = Module['asm']['q']).apply(null, arguments);
 };
 
 var calledRun;
