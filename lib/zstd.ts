@@ -238,40 +238,37 @@ function _setTempRet0(val) {
 
 var asmLibraryArg = { a: _emscripten_resize_heap, b: _setTempRet0 };
 Module['___wasm_call_ctors'] = function () {
-  return (___wasm_call_ctors = Module['___wasm_call_ctors'] = Module['asm']['d']).apply(null, arguments);
+  return (Module['___wasm_call_ctors'] = Module['asm']['d']).apply(null, arguments);
 };
 Module['_ZSTD_isError'] = function () {
-  return (_ZSTD_isError = Module['_ZSTD_isError'] = Module['asm']['e']).apply(null, arguments);
+  return (Module['_ZSTD_isError'] = Module['asm']['e']).apply(null, arguments);
 };
 Module['_ZSTD_compressBound'] = function () {
-  return (_ZSTD_compressBound = Module['_ZSTD_compressBound'] = Module['asm']['f']).apply(null, arguments);
+  return (Module['_ZSTD_compressBound'] = Module['asm']['f']).apply(null, arguments);
 };
 Module['_ZSTD_createCCtx'] = function () {
-  return (_ZSTD_createCCtx = Module['_ZSTD_createCCtx'] = Module['asm']['g']).apply(null, arguments);
+  return (Module['_ZSTD_createCCtx'] = Module['asm']['g']).apply(null, arguments);
 };
 Module['_ZSTD_freeCCtx'] = function () {
-  return (_ZSTD_freeCCtx = Module['_ZSTD_freeCCtx'] = Module['asm']['h']).apply(null, arguments);
+  return (Module['_ZSTD_freeCCtx'] = Module['asm']['h']).apply(null, arguments);
 };
 Module['_ZSTD_compress_usingDict'] = function () {
-  return (_ZSTD_compress_usingDict = Module['_ZSTD_compress_usingDict'] = Module['asm']['i']).apply(null, arguments);
+  return (Module['_ZSTD_compress_usingDict'] = Module['asm']['i']).apply(null, arguments);
 };
 Module['_ZSTD_compress'] = function () {
-  return (_ZSTD_compress = Module['_ZSTD_compress'] = Module['asm']['j']).apply(null, arguments);
+  return (Module['_ZSTD_compress'] = Module['asm']['j']).apply(null, arguments);
 };
 Module['_ZSTD_createDCtx'] = function () {
-  return (_ZSTD_createDCtx = Module['_ZSTD_createDCtx'] = Module['asm']['k']).apply(null, arguments);
+  return (Module['_ZSTD_createDCtx'] = Module['asm']['k']).apply(null, arguments);
 };
 Module['_ZSTD_freeDCtx'] = function () {
-  return (_ZSTD_freeDCtx = Module['_ZSTD_freeDCtx'] = Module['asm']['l']).apply(null, arguments);
+  return (Module['_ZSTD_freeDCtx'] = Module['asm']['l']).apply(null, arguments);
 };
 Module['_ZSTD_getFrameContentSize'] = function () {
-  return (_ZSTD_getFrameContentSize = Module['_ZSTD_getFrameContentSize'] = Module['asm']['m']).apply(null, arguments);
+  return (Module['_ZSTD_getFrameContentSize'] = Module['asm']['m']).apply(null, arguments);
 };
 Module['_ZSTD_decompress_usingDict'] = function () {
-  return (_ZSTD_decompress_usingDict = Module['_ZSTD_decompress_usingDict'] = Module['asm']['n']).apply(
-    null,
-    arguments,
-  );
+  return (Module['_ZSTD_decompress_usingDict'] = Module['asm']['n']).apply(null, arguments);
 };
 Module['_ZSTD_decompress'] = function () {
   return (_ZSTD_decompress = Module['_ZSTD_decompress'] = Module['asm']['o']).apply(null, arguments);
