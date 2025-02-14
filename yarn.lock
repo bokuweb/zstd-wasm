@@ -863,12 +863,12 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-15.6.2.tgz#c61d49f38af70da32424b5322eee21f97e627175"
   integrity sha512-dxcOx8801kMo3KlU+C+/ctWrzREAH7YvoF3aoVpRdqgs+Kf7flp+PJDN/EX5bME3suDUZHsxes9hpvBmzYlWbA==
 
-"@types/node@20.12.4":
-  version "20.12.4"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.12.4.tgz#af5921bd75ccdf3a3d8b3fa75bf3d3359268cd11"
-  integrity sha512-E+Fa9z3wSQpzgYQdYmme5X3OTuejnnTx88A6p6vkkJosR3KBz+HpE3kqNm98VE6cfLFcISx7zW7MsJkH6KwbTw==
+"@types/node@20.17.19":
+  version "20.17.19"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.17.19.tgz#0f2869555719bef266ca6e1827fcdca903c1a697"
+  integrity sha512-LEwC7o1ifqg/6r2gn9Dns0f1rhK+fPFDoMiceTJ6kWmVk6bgXBI/9IOWfVan4WiAavK9pIVWdX0/e3J+eEUh5A==
   dependencies:
-    undici-types "~5.26.4"
+    undici-types "~6.19.2"
 
 "@types/prettier@^2.1.5":
   version "2.2.3"
@@ -2510,10 +2510,10 @@ typescript@5.7:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.7.2.tgz#3169cf8c4c8a828cde53ba9ecb3d2b1d5dd67be6"
   integrity sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==
 
-undici-types@~5.26.4:
-  version "5.26.5"
-  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-5.26.5.tgz#bcd539893d00b56e964fd2657a4866b221a65617"
-  integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
+undici-types@~6.19.2:
+  version "6.19.8"
+  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-6.19.8.tgz#35111c9d1437ab83a7cdc0abae2f26d88eda0a02"
+  integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
 
 v8-to-istanbul@^9.0.1:
   version "9.0.1"
