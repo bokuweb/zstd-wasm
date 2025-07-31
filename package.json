@@ -44,7 +44,7 @@
     "prettier": "3.2.5",
     "text-encoding": "0.7.0",
     "ts-jest": "28.0.8",
-    "typescript": "5.8"
+    "typescript": "5.9"
   },
   "dependencies": {},
   "exports": {
