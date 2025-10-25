@@ -176,7 +176,7 @@ See also [example](./test/compress_using_dict.test.ts)
 ### async init(path?: string): Promise<void>
 
 Initialize module.
-Please specify path to `zstd.wasm` without bunders on browser.
+Please specify path to `zstd.wasm` without bundlers on browser.
 
 ### compress(buffer: Uint8Array, compressionLevel?: number): Uint8Array
 
